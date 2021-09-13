@@ -1,0 +1,4 @@
+[submodule "retino_stimuli"]
+	path = retino_stimuli
+	url = /project/rrg-pbellec/ria-beluga/alias/cneuromod_raw/retinotopy/stimuli
+	datalad-id = 52140b46-63c8-45a7-a03f-2f2cab0db23f
