@@ -2,19 +2,23 @@ import numpy as np
 import pandas as pd
 from scipy.io import loadmat, savemat
 
+task = 'bars'
+TR = 1.49
 # frames per second
 fps = 15.0
 # frames per task
-fpt = 420
-TR = 1.49
+fpt = 420 if task is 'bars' else 469
+
 
 # 16 seconds of instructions
 frame_sequence = np.zeros([768, 768, 300*fps])
 
 ind = [0, 1, 0, 1, 2, 3, 2, 3]
 reverse = [false, false, true, true, false, false, true, true]
-#(check for all subjects, different version?...)
-onsets = [15.982484, 47.265644, 78.564675, 109.847278, 153.145752, 184.427856, 215.727613, 247.010122]
+# From sub-01, ses-001
+#onsets = [15.982484, 47.265644, 78.564675, 109.847278, 153.145752, 184.427856, 215.727613, 247.010122]
+# Avg from sub-01, sub-02 and sub-03, ses-002 to ses-006
+onsets = [16.033847, 47.3222376, 78.615124, 109.897517, 153.194802, 184.478802, 215.772451, 247.061259]
 
 task_frames = loadmat('bars.mat')['bars'].astype('float32')
 #frames = np.load('apertures_bars.npz')['apertures']
