@@ -12,7 +12,7 @@ stim_path = '/home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis/retino
 
 for task in tasks:
     # frames per task
-    fpt = 469 if task is 'wedges' else 469
+    fpt = 469 if task is 'wedges' else 420
 
     if task is 'bars':
         ind = [0, 1, 0, 1, 2, 3, 2, 3]
