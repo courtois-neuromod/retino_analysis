@@ -51,7 +51,7 @@ for task in tasks:
     for i in range(8):
         idx_frames = ind[i]*28*15
         idx_seq = int(np.round(onsets[i] / (1.0/fps)))
-        frame_sequence[:, :, ind_seq:ind_seq+fpt] = get_cycle(scaled_frames, idx_frames, reverse[i])
+        frame_sequence[:, :, idx_seq:idx_seq+fpt] = get_cycle(scaled_frames, idx_frames, reverse[i])
 
     frame_TR = np.zeros([768, 768, int(np.ceil(300/TR))])
 
