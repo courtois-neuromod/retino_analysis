@@ -39,7 +39,7 @@ for task in tasks:
 
     # 16 seconds of instructions, 4 cycles of ~32s, 12s pause, 4 cycles of ~32s, 16s of instructions
     # 202 TRs acquired
-    frame_sequence = np.zeros([768, 768, 300*fps])
+    frame_sequence = np.zeros([768, 768, int(300*fps)])
 
     def get_cycle(frames, index, flip_order):
         f = frames[:, :, index:index+fpt]
