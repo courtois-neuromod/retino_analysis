@@ -8,7 +8,8 @@ TR = 1.49
 # frames per second
 fps = 15.0
 
-stim_path = '/home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis/retino_stimuli'
+stim_path = '/home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis/data/retinotopy/stimuli'
+out_path = '/home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis/output'
 
 for task in tasks:
     # frames per task
@@ -63,4 +64,4 @@ for task in tasks:
     # Save output
     dict = {}
     dict[task] = frame_TR
-    savemat(os.path.join(stim_path, task+'_per_TR.mat'), dict)
+    savemat(os.path.join(out_path, task+'_per_TR.mat'), dict)
