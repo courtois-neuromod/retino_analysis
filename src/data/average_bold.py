@@ -80,15 +80,15 @@ for sub in sub_list:
     sub_bold = np.concatenate(flatbolds_per_task, axis=1)
 
     # export file as either npz or .mat
-    savemat('output/' + sub + '_concatepi.mat', {sub+'_concat_epi': sub_bold})
+    savemat('../../output/' + sub + '_concatepi.mat', {sub+'_concat_epi': sub_bold})
 
 # concatenate stimulus files in the same order
 stim_list = []
 
 for task in task_list:
 
-    stimuli = loadmat(os.path.join('stimuli', task + '_per_TR.mat'))[task]
+    stimuli = loadmat(os.path.join('../../stimuli', task + '_per_TR.mat'))[task]
     stim_list.append(stimuli)
 
-concat_stimuli = np.contat(stim_list, axis = -1)
-savemat('stimuli/concattasks_per_TR.mat', {'stimuli': concat_stimuli})
+concat_stimuli = np.concatenate(stim_list, axis = -1)
+savemat('../../stimuli/concattasks_per_TR.mat', {'stimuli': concat_stimuli})
