@@ -3,11 +3,18 @@ import numpy as np
 import pandas as pd
 import nibabel as nib
 import nilearn
+from nilearn.signal import clean
 from nilearn.masking import apply_mask, intersect_masks
+from nilearn.image import resample_to_img
+from load_confounds import Minimal
 
 from scipy.io import loadmat, savemat
 
-scan_path = '/lustre03/project/6003287/datasets/cneuromod_processed/fmriprep/retinotopy'
+
+debug = True
+
+#scan_path = '/lustre03/project/6003287/datasets/cneuromod_processed/fmriprep/retinotopy'
+scan_path = '../../data/temp_bold'
 
 #sub-01/ses-001/func/sub-01_ses-001_task-bars_space-T1w_desc-preproc_part-mag_bold.nii.gz
 #sub-01/ses-001/func/sub-01_ses-001_task-rings_space-T1w_desc-preproc_part-mag_bold.nii.gz
@@ -21,13 +28,16 @@ task_list = ['wedges', 'rings', 'bars']
 for sub in sub_list:
 
     epilist_per_task = []
+    confounds_per_task = []
     mask_list = []
     sub_affine = None
 
     for task in task_list:
 
-        scan_list = sorted(glob.glob(os.path.join(scan_path, sub, 'ses*/func/sub*' + task + '_space-T1w_desc-preproc_part-mag_bold.nii.gz')))
+        #scan_list = sorted(glob.glob(os.path.join(scan_path, sub, 'ses*/func/sub*' + task + '_space-T1w_desc-preproc_part-mag_bold.nii.gz')))
+        scan_list = sorted(glob.glob(os.path.join(scan_path, sub + '*' + task + '_space-T1w_desc-preproc_part-mag_bold.nii.gz')))
         epi_list = []
+        conf_list = []
 
         for scan in scan_list:
 
@@ -44,20 +54,47 @@ for sub in sub_list:
 
             assert epi.shape[-1] == 202
             #bold_array = epi.get_fdata()
+
+            # extract epi's confounds
+            #confounds = Minimal(global_signal='basic').load(scan)
+            confounds = Minimal(global_signal='basic').load(scan[:-20] + 'bold.nii.gz')
+
             epi_list.append(epi)
+            conf_list.append(confounds)
 
         epilist_per_task.append(epi_list)
+        confounds_per_task.append(conf_list)
 
     mean_mask = intersect_masks(mask_list, threshold=0.3)
 
+    if debug:
+        # mask of visual regions adapted from https://scholar.princeton.edu/napl/resources (in MNI space)
+        # NOT a great mask for this setting, but gets some voxels in visual cortex
+        vis_mask = nib.load('../../masks/allvisualareas.nii.gz')
+        vis_mask_rs = resample_to_img(vis_mask, mean_mask, interpolation='nearest')
+        vis_mask_int = intersect_masks((vis_mask_rs, mean_mask), threshold=1.0)
+        mean_mask = vis_mask_int
+
     flatbolds_per_task = []
-    for epi_list in epilist_per_task:
+    for i in range(len(epilist_per_task)):
+
+        epi_list = epilist_per_task[i]
 
         flatbold_list = []
-        for epi in epi_list:
-            flat_bold = apply_mask(imgs=epi, mask_img=mean_mask).T # shape: vox per
 
-            flatbold_list.append(flat_bold)
+        for j in range(len(epi_list)):
+            epi = epi_list[j]
+            flat_bold = apply_mask(imgs=epi, mask_img=mean_mask).T # shape: vox per time
+
+            confounds = confounds_per_task[i][j]
+
+            # Detrend and normalize flattened data
+            # note: signal.clean takes (time, vox) shaped input, and flat_bold is (vox, time) (hence the transposing)
+            flat_bold_dt = clean(flat_bold.T, detrend=True, standardize='zscore',
+                                 standardize_confounds=True, t_r=None, confounds=confounds, ensure_finite=True).T
+
+            # Remove first 3 volumes of each run
+            flatbold_list.append(flat_bold_dt[:, 3:])
 
         # sanity checks performed
         # for each subject in T1w space, affine matrices are the same for scans and masks across sessions and tasks
@@ -80,7 +117,7 @@ for sub in sub_list:
     sub_bold = np.concatenate(flatbolds_per_task, axis=1)
 
     # export file as either npz or .mat
-    savemat('../../output/' + sub + '_concatepi.mat', {sub+'_concat_epi': sub_bold})
+    savemat('../../output/detrend/' + sub + '_concatepi.mat', {sub+'_concat_epi': sub_bold})
 
 # concatenate stimulus files in the same order
 stim_list = []
@@ -88,7 +125,8 @@ stim_list = []
 for task in task_list:
 
     stimuli = loadmat(os.path.join('../../stimuli', task + '_per_TR.mat'))[task]
-    stim_list.append(stimuli)
+    # TODO: remove first 3 TRs of each task for signal equilibration
+    stim_list.append(stimuli[:, :, 3:])
 
 concat_stimuli = np.concatenate(stim_list, axis = -1)
 savemat('../../stimuli/concattasks_per_TR.mat', {'stimuli': concat_stimuli})
