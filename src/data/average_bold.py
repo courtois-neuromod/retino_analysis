@@ -16,7 +16,7 @@ parser.add_argument('--debug', action='store_true', default=False, help='selects
 args = parser.parse_args()
 
 #scan_path = '/lustre03/project/6003287/datasets/cneuromod_processed/fmriprep/retinotopy'
-scan_path = '../../data/temp_bold'
+dir_path = '/home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis'
 
 #sub-01/ses-001/func/sub-01_ses-001_task-bars_space-T1w_desc-preproc_part-mag_bold.nii.gz
 #sub-01/ses-001/func/sub-01_ses-001_task-rings_space-T1w_desc-preproc_part-mag_bold.nii.gz
@@ -37,7 +37,7 @@ for sub in sub_list:
     for task in task_list:
 
         #scan_list = sorted(glob.glob(os.path.join(scan_path, sub, 'ses*/func/sub*' + task + '_space-T1w_desc-preproc_part-mag_bold.nii.gz')))
-        scan_list = sorted(glob.glob(os.path.join(scan_path, sub + '*' + task + '_space-T1w_desc-preproc_part-mag_bold.nii.gz')))
+        scan_list = sorted(glob.glob(os.path.join(dir_path, 'data', 'temp_bold', sub + '*' + task + '_space-T1w_desc-preproc_part-mag_bold.nii.gz')))
         epi_list = []
         conf_list = []
 
@@ -72,7 +72,7 @@ for sub in sub_list:
     if args.debug:
         # mask of visual regions adapted from https://scholar.princeton.edu/napl/resources (in MNI space)
         # NOT a great mask for this setting, but gets some voxels in visual cortex
-        vis_mask = nib.load('../../masks/allvisualareas.nii.gz')
+        vis_mask = nib.load(os.path.join(dir_path, 'masks', 'allvisualareas.nii.gz'))
         vis_mask_rs = resample_to_img(vis_mask, mean_mask, interpolation='nearest')
         vis_mask_int = intersect_masks((vis_mask_rs, mean_mask), threshold=1.0)
         mean_mask = vis_mask_int
@@ -120,11 +120,11 @@ for sub in sub_list:
 
     # export file as either npz or .mat
     if args.debug:
-        savemat('../../output/detrend/' + sub + '_concatepi_visualareas.mat', {sub+'_concat_epi': sub_bold})
-        savemat('../../output/detrend/' + sub + '_concatepi_visualareas_pertask.mat', {sub+'_concat_epi': flatbolds_per_task})
+        savemat(os.path.join(dir_path, 'output', 'detrend', sub + '_concatepi_visualareas.mat'), {sub+'_concat_epi': sub_bold})
+        savemat(os.path.join(dir_path, 'output', 'detrend', sub + '_concatepi_visualareas_pertask.mat'), {sub+'_concat_epi': flatbolds_per_task})
     else:
-        savemat('../../output/detrend/' + sub + '_concatepi_fullbrain.mat', {sub+'_concat_epi': sub_bold})
-        savemat('../../output/detrend/' + sub + '_concatepi_fullbrain_pertask.mat', {sub+'_concat_epi': flatbolds_per_task})
+        savemat(os.path.join(dir_path, 'output', 'detrend', sub + '_concatepi_fullbrain.mat'), {sub+'_concat_epi': sub_bold})
+        savemat(os.path.join(dir_path, 'output', 'detrend', sub + '_concatepi_fullbrain_pertask.mat'), {sub+'_concat_epi': flatbolds_per_task})
 
 # concatenate stimulus files in the same order
 stim_list = []
