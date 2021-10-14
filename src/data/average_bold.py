@@ -9,9 +9,11 @@ from nilearn.image import resample_to_img
 from load_confounds import Minimal
 
 from scipy.io import loadmat, savemat
+import argparse
 
-
-debug = True
+parser = argparse.ArgumentParser(description='Train NIF model')
+parser.add_argument('--debug', action='store_true', default=False, help='selects fewer voxels from visual cortex')
+args = parser.parse_args()
 
 #scan_path = '/lustre03/project/6003287/datasets/cneuromod_processed/fmriprep/retinotopy'
 scan_path = '../../data/temp_bold'
@@ -67,7 +69,7 @@ for sub in sub_list:
 
     mean_mask = intersect_masks(mask_list, threshold=0.3)
 
-    if debug:
+    if args.debug:
         # mask of visual regions adapted from https://scholar.princeton.edu/napl/resources (in MNI space)
         # NOT a great mask for this setting, but gets some voxels in visual cortex
         vis_mask = nib.load('../../masks/allvisualareas.nii.gz')
@@ -116,8 +118,17 @@ for sub in sub_list:
     # Concatenate across tasks
     sub_bold = np.concatenate(flatbolds_per_task, axis=1)
 
+    dict_per_task = {}
+    for i in range(len(task_list)):
+        dict_per_task[sub+'_concat_epi_'+task_list[i]] = flatbolds_per_task[i]
+
     # export file as either npz or .mat
-    savemat('../../output/detrend/' + sub + '_concatepi.mat', {sub+'_concat_epi': sub_bold})
+    if args.debug:
+        savemat('../../output/detrend/' + sub + '_concatepi_visualareas.mat', {sub+'_concat_epi': sub_bold})
+        savemat('../../output/detrend/' + sub + '_concatepi_visualareas_pertask.mat', dict_per_task)
+    else:
+        savemat('../../output/detrend/' + sub + '_concatepi_fullbrain.mat', {sub+'_concat_epi': sub_bold})
+        savemat('../../output/detrend/' + sub + '_concatepi_fullbrain_pertask.mat', dict_per_task)
 
 # concatenate stimulus files in the same order
 stim_list = []
