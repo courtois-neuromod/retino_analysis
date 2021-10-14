@@ -72,7 +72,7 @@ for sub in sub_list:
     if args.debug:
         # mask of visual regions adapted from https://scholar.princeton.edu/napl/resources (in MNI space)
         # NOT a great mask for this setting, but gets some voxels in visual cortex
-        vis_mask = nib.load(os.path.join(dir_path, 'masks', 'allvisualareas.nii.gz'))
+        vis_mask = nib.load(os.path.join(dir_path, 'temp_mask', 'allvisualareas.nii.gz'))
         vis_mask_rs = resample_to_img(vis_mask, mean_mask, interpolation='nearest')
         vis_mask_int = intersect_masks((vis_mask_rs, mean_mask), threshold=1.0)
         mean_mask = vis_mask_int
