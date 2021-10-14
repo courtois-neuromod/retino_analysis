@@ -136,5 +136,5 @@ for task in task_list:
     stim_list.append(stimuli[:, :, 3:])
 
 concat_stimuli = np.concatenate(stim_list, axis = -1)
-savemat('../../stimuli/concattasks_per_TR.mat', {'stimuli': concat_stimuli})
-savemat('../../stimuli/concattasks_per_TR_pertask.mat', {'stimuli': stim_list})
+savemat(os.path.join(dir_path, 'stimuli', 'concattasks_per_TR.mat'), {'stimuli': concat_stimuli})
+savemat(os.path.join(dir_path, 'stimuli', 'concattasks_per_TR_pertask.mat'), {'stimuli': stim_list})
