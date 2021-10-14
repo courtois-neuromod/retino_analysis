@@ -131,7 +131,7 @@ stim_list = []
 
 for task in task_list:
 
-    stimuli = loadmat(os.path.join('../../stimuli', task + '_per_TR.mat'))[task]
+    stimuli = loadmat(os.path.join(dir_path, 'stimuli', task + '_per_TR.mat'))[task]
     # TODO: remove first 3 TRs of each task for signal equilibration
     stim_list.append(stimuli[:, :, 3:])
 
