@@ -118,17 +118,13 @@ for sub in sub_list:
     # Concatenate across tasks
     sub_bold = np.concatenate(flatbolds_per_task, axis=1)
 
-    dict_per_task = {}
-    for i in range(len(task_list)):
-        dict_per_task[sub+'_concat_epi_'+task_list[i]] = flatbolds_per_task[i]
-
     # export file as either npz or .mat
     if args.debug:
         savemat('../../output/detrend/' + sub + '_concatepi_visualareas.mat', {sub+'_concat_epi': sub_bold})
-        savemat('../../output/detrend/' + sub + '_concatepi_visualareas_pertask.mat', dict_per_task)
+        savemat('../../output/detrend/' + sub + '_concatepi_visualareas_pertask.mat', {sub+'_concat_epi': flatbolds_per_task})
     else:
         savemat('../../output/detrend/' + sub + '_concatepi_fullbrain.mat', {sub+'_concat_epi': sub_bold})
-        savemat('../../output/detrend/' + sub + '_concatepi_fullbrain_pertask.mat', dict_per_task)
+        savemat('../../output/detrend/' + sub + '_concatepi_fullbrain_pertask.mat', {sub+'_concat_epi': flatbolds_per_task})
 
 # concatenate stimulus files in the same order
 stim_list = []
@@ -141,3 +137,4 @@ for task in task_list:
 
 concat_stimuli = np.concatenate(stim_list, axis = -1)
 savemat('../../stimuli/concattasks_per_TR.mat', {'stimuli': concat_stimuli})
+savemat('../../stimuli/concattasks_per_TR_pertask.mat', {'stimuli': stim_list})
