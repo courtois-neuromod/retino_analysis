@@ -4,8 +4,10 @@ import pandas as pd
 import nibabel as nib
 import nilearn
 from nilearn.signal import clean
-from nilearn.masking import apply_mask, intersect_masks
+from nilearn.masking import apply_mask, intersect_masks, unmask
 from nilearn.image import resample_to_img
+from nilearn.image.image import mean_img, smooth_img
+from nilearn.plotting import view_img
 from load_confounds import Minimal
 
 from scipy.io import loadmat, savemat
@@ -31,8 +33,11 @@ for sub in sub_list:
 
     epilist_per_task = []
     confounds_per_task = []
-    mask_list = []
     sub_affine = None
+
+    anat_path = '/project/rrg-pbellec/datasets/cneuromod_processed/smriprep/' + sub + '/anat'
+    seg_mask = nib.load(os.path.join(anat_path, sub + '_label-GM_probseg.nii.gz'))
+
 
     for task in task_list:
 
@@ -45,10 +50,6 @@ for sub in sub_list:
 
             if sub_affine is None:
                 sub_affine = nib.load(scan).affine
-
-            mask = nib.load(glob.glob(scan[:-28] + 'brain_part-mag_mask.nii.gz')[0])#.get_fdata().astype(int) # (76, 90, 71) = x, y, z
-            assert np.sum(mask.affine == sub_affine) == 16
-            mask_list.append(mask)
 
             epi = nib.load(scan)
             assert np.sum(epi.affine == sub_affine) == 16
@@ -67,16 +68,12 @@ for sub in sub_list:
         epilist_per_task.append(epi_list)
         confounds_per_task.append(conf_list)
 
-    mean_mask = intersect_masks(mask_list, threshold=0.3)
-    nib.save(mean_mask, os.path.join(dir_path, 'output', 'masks', sub + '_mean_epi_mask.nii.gz'))
+    mean_epi = mean_img(epilist_per_task[0][0])
+    seg_mask_rs = resample_to_img(seg_mask, mean_epi, interpolation='nearest')
+    seg_mask_rs_sm = smooth_img(imgs=seg_mask_rs, fwhm=3)
+    sub_mask = nib.nifti1.Nifti1Image((seg_mask_rs_sm.get_fdata() > 0.3).astype('float'), affine=seg_mask_rs_sm.affine)
 
-    if args.debug:
-        # mask of visual regions adapted from https://scholar.princeton.edu/napl/resources (in MNI space)
-        # NOT a great mask for this setting, but gets some voxels in visual cortex
-        vis_mask = nib.load(os.path.join(dir_path, 'temp_mask', 'allvisualareas.nii.gz'))
-        vis_mask_rs = resample_to_img(vis_mask, mean_mask, interpolation='nearest')
-        vis_mask_int = intersect_masks((vis_mask_rs, mean_mask), threshold=1.0)
-        mean_mask = vis_mask_int
+    nib.save(sub_mask, os.path.join(dir_path, 'output', 'masks', sub + '_GMmask.nii.gz'))
 
     flatbolds_per_task = []
     for i in range(len(epilist_per_task)):
@@ -87,7 +84,7 @@ for sub in sub_list:
 
         for j in range(len(epi_list)):
             epi = epi_list[j]
-            flat_bold = apply_mask(imgs=epi, mask_img=mean_mask).T # shape: vox per time
+            flat_bold = apply_mask(imgs=epi, mask_img=sub_mask).T # shape: vox per time
 
             confounds = confounds_per_task[i][j]
 
@@ -98,6 +95,14 @@ for sub in sub_list:
 
             # Remove first 3 volumes of each run
             flatbold_list.append(flat_bold_dt[:, 3:])
+
+            '''
+            Code to unmask: return flattened data into brain space for visualization, analyses
+            Source code: https://github.com/nilearn/nilearn/blob/1607b52458c28953a87bbe6f42448b7b4e30a72f/nilearn/masking.py#L900
+            Returns .nii object
+
+            deflat_bold = unmask(flat_bold_dt[:, 3:], sub_mask)
+            '''
 
         # sanity checks performed
         # for each subject in T1w space, affine matrices are the same for scans and masks across sessions and tasks
@@ -128,6 +133,7 @@ for sub in sub_list:
         savemat(os.path.join(dir_path, 'output', 'detrend', sub + '_concatepi_fullbrain_pertask.mat'), {sub+'_concat_epi': flatbolds_per_task})
 
 # concatenate stimulus files in the same order
+'''
 stim_list = []
 
 for task in task_list:
@@ -139,3 +145,4 @@ for task in task_list:
 concat_stimuli = np.concatenate(stim_list, axis = -1)
 savemat(os.path.join(dir_path, 'stimuli', 'concattasks_per_TR.mat'), {'stimuli': concat_stimuli})
 savemat(os.path.join(dir_path, 'stimuli', 'concattasks_per_TR_pertask.mat'), {'stimuli': stim_list})
+'''
