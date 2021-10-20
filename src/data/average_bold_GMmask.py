@@ -71,7 +71,7 @@ for sub in sub_list:
     mean_epi = mean_img(epilist_per_task[0][0])
     seg_mask_rs = resample_to_img(seg_mask, mean_epi, interpolation='nearest')
     seg_mask_rs_sm = smooth_img(imgs=seg_mask_rs, fwhm=3)
-    sub_mask = nib.nifti1.Nifti1Image((seg_mask_rs_sm.get_fdata() > 0.2).astype('float'), affine=seg_mask_rs_sm.affine)
+    sub_mask = nib.nifti1.Nifti1Image((seg_mask_rs_sm.get_fdata() > 0.15).astype('float'), affine=seg_mask_rs_sm.affine)
 
     nib.save(sub_mask, os.path.join(dir_path, 'output', 'masks', sub + '_GMmask.nii.gz'))
 
