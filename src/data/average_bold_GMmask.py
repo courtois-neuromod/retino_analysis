@@ -125,12 +125,10 @@ for sub in sub_list:
     sub_bold = np.concatenate(flatbolds_per_task, axis=1)
 
     # export file as either npz or .mat
-    if args.debug:
-        savemat(os.path.join(dir_path, 'output', 'detrend', sub + '_concatepi_visualareas.mat'), {sub+'_concat_epi': sub_bold})
-        savemat(os.path.join(dir_path, 'output', 'detrend', sub + '_concatepi_visualareas_pertask.mat'), {sub+'_concat_epi': flatbolds_per_task})
-    else:
-        savemat(os.path.join(dir_path, 'output', 'detrend', sub + '_concatepi_fullbrain.mat'), {sub+'_concat_epi': sub_bold})
-        savemat(os.path.join(dir_path, 'output', 'detrend', sub + '_concatepi_fullbrain_pertask.mat'), {sub+'_concat_epi': flatbolds_per_task})
+    savemat(os.path.join(dir_path, 'output', 'detrend', sub + '_concatepi_GMbrain.mat'), {sub+'_concat_epi': sub_bold})
+    for i in range(len(flatbolds_per_task)):
+        task = task_list[i]
+        savemat(os.path.join(dir_path, 'output', 'detrend', sub + '_epi_GMbrain_' + task + '.mat'), {sub + '_' + task : flatbolds_per_task[i]})
 
 # concatenate stimulus files in the same order
 '''
