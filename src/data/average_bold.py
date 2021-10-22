@@ -68,7 +68,7 @@ for sub in sub_list:
         confounds_per_task.append(conf_list)
 
     mean_mask = intersect_masks(mask_list, threshold=0.3)
-    nib.save(mean_mask, os.path.join(dir_path, 'output', 'masks', sub + '_mean_epi_mask.nii.gz'))
+
 
     if args.debug:
         # mask of visual regions adapted from https://scholar.princeton.edu/napl/resources (in MNI space)
@@ -77,6 +77,9 @@ for sub in sub_list:
         vis_mask_rs = resample_to_img(vis_mask, mean_mask, interpolation='nearest')
         vis_mask_int = intersect_masks((vis_mask_rs, mean_mask), threshold=1.0)
         mean_mask = vis_mask_int
+        nib.save(mean_mask, os.path.join(dir_path, 'output', 'masks', sub + '_visareas_mask.nii.gz'))
+    else:
+        nib.save(mean_mask, os.path.join(dir_path, 'output', 'masks', sub + '_mean_epi_mask.nii.gz'))
 
     flatbolds_per_task = []
     for i in range(len(epilist_per_task)):
