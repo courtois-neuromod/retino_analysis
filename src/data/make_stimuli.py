@@ -80,10 +80,6 @@ for task in tasks:
 
         savemat(os.path.join(out_path, task+'_per_TR_slice' + str(slice_num) + '.mat'), {task + '_slice' + str(slice_num): slice_frames.astype('bool')})
 
-
-    for TR in range(np.ceil(300/TR)):
-        idx =
-
     # frames averaged per TR
     frame_TR = np.zeros([768, 768, int(np.ceil(300/TR))])
 
