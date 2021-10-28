@@ -1,0 +1,17 @@
+{
+    "subject": "sub-01",
+    "task_list": ["wedges", "rings", "bars"],
+
+    "use_GM_mask": false,
+    "stimulus_brik": "/path/to/brik/file/stim.308.LIA.bmask.resam+orig.BRIK",
+    "stimulus_head": "/path/to/brik/file/stim.308.LIA.bmask.resam+orig.HEAD",
+
+
+    "seasons": ["01", "02", "03"],
+    "test_run_nums": ["05a", "10b", "15a", "20b"],
+
+
+    "homedir": "/project/rrg-pbellec/mstlaure/cneuromodNIF",
+    "basedir": "/project/rrg-pbellec/mstlaure/"
+
+}

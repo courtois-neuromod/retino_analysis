@@ -139,6 +139,6 @@ for task in task_list:
     # TODO: remove first 3 TRs of each task for signal equilibration
     stim_list.append(stimuli[:, :, 3:])
 
-concat_stimuli = np.concatenate(stim_list, axis = -1)
+concat_stimuli = np.concatenate(stim_list, axis = -1).astype('f4')
 savemat(os.path.join(dir_path, 'stimuli', 'concattasks_per_TR.mat'), {'stimuli': concat_stimuli})
 savemat(os.path.join(dir_path, 'stimuli', 'concattasks_per_TR_pertask.mat'), {'stimuli': stim_list})

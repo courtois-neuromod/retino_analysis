@@ -15,11 +15,16 @@ p.NumWorkers
 
 %(ginkgo : 25 moi, 55 toi) et (elm : 50 moi, 14 toi)
 
-load('wedges_per_TR_199.mat');
-load('rings_per_TR_199.mat');
-load('bars_per_TR_199.mat');
+%load('wedges_per_TR_199.mat');
+%load('rings_per_TR_199.mat');
+%load('bars_per_TR_199.mat');
 
-stimuli = {wedges, rings, bars};
+load('wedges_per_TR199_192x192.mat');
+load('rings_per_TR199_192x192.mat');
+load('bars_per_TR199_192x192.mat');
+
+stimuli = {single(wedges), single(rings), single(bars)};
+clear wedges, clear rings, clear bars;
 
 % number of voxels?
 num_vox = 124350
@@ -36,7 +41,9 @@ for i = 0:ceil(num_vox / chunk_size)
     load(['sub-01_epi_GMbrain_rings' extension]);
     load(['sub-01_epi_GMbrain_bars' extension]);
 
-    data = {sub01_wedges, sub01_rings, sub01_bars};
+    %data = {sub01_wedges, sub01_rings, sub01_bars};
+    data = {single(sub01_wedges), single(sub01_rings), single(sub01_bars)};
+    clear sub01_wedges, clear sub01_rings, clear sub01_bars;
 
     results = analyzePRF(stimuli,data,1.49,struct('seedmode',[0 1 2],'display','off'));
 

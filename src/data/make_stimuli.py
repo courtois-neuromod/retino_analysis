@@ -54,6 +54,37 @@ for task in tasks:
         idx_seq = int(np.round(onsets[i] / (1.0/fps)))
         frame_sequence[:, :, idx_seq:idx_seq+fpt] = get_cycle(scaled_frames, idx_frames, reverse[i])
 
+    savemat(os.path.join(out_path, task+'_per_frame.mat'), {task: frame_sequence.astype('bool')})
+
+    # creating a set of frames for a particular slice
+    # 15 = brain slices per TR (60 slices/ TR, with 4 multibands)
+    # 300s / 1.49s = number of TRs (202)
+    bslice_per_TR = 15
+
+    total_slices = int(np.ceil(300/TR)*15)
+    frame_slice = np.zeros([768, 768, total_slices])
+
+    for slice in range(total_slices):
+        idx = int(np.round((slice * TR * fps) / bslice_per_TR))
+        frame_slice[:, :, slice] = frame_sequence[:, :, idx]
+
+    savemat(os.path.join(out_path, task+'_per_slice.mat'), {task: frame_slice.astype('bool')})
+
+    for slice_num in range(bslice_per_TR):
+        slice_frames = np.zeros([768, 768, int(np.ceil(300/TR))])
+
+        for t in range(int(np.ceil(300/TR))):
+            #idx = int(np.round((TR * t * fps) + slice_num*(TR/bslice_per_TR)*fps))
+            idx = int(np.round(TR*fps*(t + (slice_num/bslice_per_TR))))
+            slice_frames[:, :, t] = frame_sequence[:, :, idx]
+
+        savemat(os.path.join(out_path, task+'_per_TR_slice' + str(slice_num) + '.mat'), {task + '_slice' + str(slice_num): slice_frames.astype('bool')})
+
+
+    for TR in range(np.ceil(300/TR)):
+        idx =
+
+    # frames averaged per TR
     frame_TR = np.zeros([768, 768, int(np.ceil(300/TR))])
 
     for f in range(frame_TR.shape[2]):
@@ -63,5 +94,5 @@ for task in tasks:
 
     # Save output
     dict = {}
-    dict[task] = frame_TR
+    dict[task] = frame_TR.astype('f4')
     savemat(os.path.join(out_path, task+'_per_TR.mat'), dict)
