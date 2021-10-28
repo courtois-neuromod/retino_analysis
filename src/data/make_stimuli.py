@@ -71,9 +71,9 @@ for task in tasks:
     savemat(os.path.join(out_path, task+'_per_slice.mat'), {task: frame_slice.astype('bool')})
 
     for slice_num in range(bslice_per_TR):
-        slice_frames = np.zeros([768, 768, int(np.ceil(300/TR))])
+        slice_frames = np.zeros([768, 768, int(np.floor(300/TR))])
 
-        for t in range(int(np.ceil(300/TR))):
+        for t in range(int(np.floor(300/TR))):
             #idx = int(np.round((TR * t * fps) + slice_num*(TR/bslice_per_TR)*fps))
             idx = int(np.round(TR*fps*(t + (slice_num/bslice_per_TR))))
             slice_frames[:, :, t] = frame_sequence[:, :, idx]
