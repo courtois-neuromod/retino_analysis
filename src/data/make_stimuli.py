@@ -61,7 +61,7 @@ for task in tasks:
     # 300s / 1.49s = number of TRs (202)
     bslice_per_TR = 15
 
-    total_slices = int(np.ceil(300/TR)*15)
+    total_slices = int(np.floor(300/TR)*15)
     frame_slice = np.zeros([768, 768, total_slices])
 
     for slice in range(total_slices):
