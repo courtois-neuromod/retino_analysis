@@ -19,12 +19,17 @@ for sub in sub_list:
 
     for task in task_list:
 
-        bold = loadmat(os.path.join(dir_path, 'output', 'detrend', sub + '_epi_GMbrain_' + task + '.mat'))[sub + '_' + task]
+        bold = loadmat(os.path.join(dir_path, 'output', 'detrend', sub + '_epi_FULLbrain_' + task + '.mat'))[sub + '_' + task]
 
         num_vox = bold.shape[0]
-        chunk_size = 220
+        chunk_size = 240
+        '''
+        sub-01: 205455 voxels (w inclusive full brain mask)
+        sub-02: 221489 voxels (w inclusive full brain mask)
+        sub-03: 197945 voxels (w inclusive full brain mask)
+        '''
 
-        file_path = os.path.join(dir_path, 'output', 'detrend', 'chunks', sub + '_epi_GMbrain_' + task + '_%04d.mat')
+        file_path = os.path.join(dir_path, 'output', 'detrend', 'chunks_fullbrain', 's'+ sub[-2:], sub + '_epi_FULLbrain_' + task + '_%04d.mat')
 
         for i in range(int(np.ceil(num_vox/chunk_size))):
 
