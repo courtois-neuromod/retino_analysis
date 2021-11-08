@@ -1,7 +1,8 @@
 
 # FS on CC doc link: https://docs.computecanada.ca/wiki/FreeSurfer
 
-# module load freesurfer/5.3.0
+# BEFORE HAND IN CONSOLE:
+# module load freesurfer/7.1.1
 # source $EBROOTFREESURFER/FreeSurferEnv.sh
 
 # workon retino_analysis #virtual env...
@@ -53,4 +54,4 @@ path_list = [ecc_path, ang_path, r2_path, rfsize_path, x_path, y_path]
 outname_list = ['prf_ecc', 'prf_ang', 'prf_r2', 'prf_rfsize', 'prf_x', 'prf_y', ]
 
 for path, outname in zip(path_list, outname_list):
-    call_vol2surf(sub, path, outname, fs_out_dir)
+    call_vol2surf(sub, path, 's'+sub[-2:]+'_'+outname, fs_out_dir)

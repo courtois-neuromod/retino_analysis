@@ -1,6 +1,8 @@
-#USmodule load freesurfer/5.3.0
+#module load freesurfer/5.3.0
 module load freesurfer/7.1.1
 #source $EBROOTFREESURFER/FreeSurferEnv.sh
+
+# ex to run: ./run_FS.sh 01 rfsize
 
 workon retino_analysis
 
@@ -16,11 +18,11 @@ RES_TYPE=${2} # ecc, ang, R2, rfsize, x, y
 
 #VOLFILE="/project/rrg-pbellec/mstlaure/retino_analysis/results/s01_3tasks_ecc.nii.gz"
 VOLDIR="/project/rrg-pbellec/mstlaure/retino_analysis/results"
-VOLFILE="${VOLDIR}/s${SUB_NUM}_3tasks_${RES_TYPE}.nii.gz"
+VOLFILE="${VOLDIR}/sub-${SUB_NUM}_fullbrain_${RES_TYPE}.nii.gz"
 
 OUTDIR="/project/rrg-pbellec/mstlaure/retino_analysis/results/fs"
-L_OUTFILE="${OUTDIR}/lh.s${SUB_NUM}_prf_${RES_TYPE}.mgz"
-R_OUTFILE="${OUTDIR}/rh.s${SUB_NUM}_prf_${RES_TYPE}.mgz"
+L_OUTFILE="${OUTDIR}/sub-${SUB_NUM}/lh.s${SUB_NUM}_prf_${RES_TYPE}.mgz"
+R_OUTFILE="${OUTDIR}/sub-${SUB_NUM}/rh.s${SUB_NUM}_prf_${RES_TYPE}.mgz"
 
 mri_vol2surf --src ${VOLFILE} --out ${L_OUTFILE} --regheader "sub-${SUB_NUM}" --hemi lh
 mri_vol2surf --src ${VOLFILE} --out ${R_OUTFILE} --regheader "sub-${SUB_NUM}" --hemi rh
