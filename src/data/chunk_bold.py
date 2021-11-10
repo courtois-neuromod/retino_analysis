@@ -14,6 +14,7 @@ import argparse
 
 parser = argparse.ArgumentParser(description='Average bold response across retino sessions')
 parser.add_argument('--run_dir', default=None, type=str, help='path to run dir (absolute)')
+parser.add_argument('--chunk_size', default=240, type=int, help='number of voxels per chunk')
 args = parser.parse_args()
 
 dir_path = '/home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis' if args.run_dir is None else args.run_dir
@@ -28,22 +29,19 @@ for sub in sub_list:
         bold = loadmat(os.path.join(dir_path, 'output', 'detrend', sub + '_epi_FULLbrain_' + task + '.mat'))[sub + '_' + task]
 
         num_vox = bold.shape[0]
-        # ideally a multiple of the number of cores (matlab workers) available to process data on elm/ginkco
-        # default for parpool processing set in interface (local profile)
-        chunk_size = 240
+        # ideally a multiple of the number of cores (matlab workers) available in profile on elm/ginkco
+        # default for parpool processing set in interface (local profile), bottom left icon
+        chunk_size = args.chunk_size
         '''
+        Number of voxels within "Whole Brain" mask outputed by average_bold.py, per participant
         sub-01: 205455 voxels (w inclusive full brain mask)
         sub-02: 221489 voxels (w inclusive full brain mask)
         sub-03: 197945 voxels (w inclusive full brain mask)
         '''
 
-        file_path = os.path.join(dir_path, 'output', 'detrend', 'chunks_fullbrain', 's'+ sub[-2:], sub + '_epi_FULLbrain_' + task + '_%04d.mat')
+        #file_path = os.path.join(dir_path, 'output', 'detrend', 'chunks_fullbrain', 's'+ sub[-2:], sub + '_epi_FULLbrain_' + task + '_%04d.mat')
+        file_path = os.path.join(dir_path, 'test', 'detrend', 'chunks_fullbrain', 's'+ sub[-2:], sub + '_epi_FULLbrain_' + task + '_%04d.mat')
 
         for i in range(int(np.ceil(num_vox/chunk_size))):
 
             savemat(file_path % i, {'sub' + sub[-2:] + '_' + task: bold[i*chunk_size:(i+1)*chunk_size, :]})
-
-
-#bold = loadmat(os.path.join(dir_path, 'output', 'detrend', sub + '_epi_GMbrain_' + task + '.mat'))[sub + '_' + task]
-#file_path = os.path.join(dir_path, 'output', 'detrend', 'chunks', sub + '_epi_GMbrain_' + task + '_%04d.mat')
-#for i in range(int(np.ceil(bold.shape[0]/chunk_size))): savemat(file_path % i, {'sub' + sub[-2:] + '_' + task: bold[i*chunk_size:(i+1)*chunk_size, :]})

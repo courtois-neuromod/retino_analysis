@@ -8,6 +8,7 @@ from nilearn.image import resample_to_img
 from nilearn.image.image import mean_img, smooth_img
 from nilearn.plotting import view_img
 from load_confounds import Minimal
+from skimage.transform import resize
 
 from scipy.io import loadmat, savemat
 import argparse
