@@ -30,9 +30,7 @@ TR = 1.49
 fps = 15.0
 
 stim_path = '/home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis/data/retinotopy/stimuli'
-#out_path = '/home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis/stimuli'
-
-out_path = '/home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis/test'
+out_path = '/home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis/stimuli'
 
 for task in tasks:
     # frames per task
@@ -86,31 +84,31 @@ for task in tasks:
     15 = brain slices per TR (60 slices/ TR, with 4 multibands)
     300s / 1.49s = number of TRs (202)
     '''
-    bslice_per_TR = 15
+    #bslice_per_TR = 15
 
-    total_slices = int(np.floor(300/TR)*15)
-    frame_slice = np.zeros([768, 768, total_slices])
+    #total_slices = int(np.floor(300/TR)*15)
+    #frame_slice = np.zeros([768, 768, total_slices])
 
-    for slice in range(total_slices):
-        idx = int(np.round((slice * TR * fps) / bslice_per_TR))
-        frame_slice[:, :, slice] = frame_sequence[:, :, idx]
+    #for slice in range(total_slices):
+    #    idx = int(np.round((slice * TR * fps) / bslice_per_TR))
+    #    frame_slice[:, :, slice] = frame_sequence[:, :, idx]
 
-    savemat(os.path.join(out_path, task+'_per_slice.mat'), {task: frame_slice.astype('bool')})
+    #savemat(os.path.join(out_path, task+'_per_slice.mat'), {task: frame_slice.astype('bool')})
     '''
     Just a different way to reslice the frames: for each brain slice (each of 15),
     a binary frame is chosen for each TR
     Outputs 15 different files
     '''
 
-    for slice_num in range(bslice_per_TR):
-        slice_frames = np.zeros([768, 768, int(np.floor(300/TR))])
+    #for slice_num in range(bslice_per_TR):
+    #    slice_frames = np.zeros([768, 768, int(np.floor(300/TR))])
 
-        for t in range(int(np.floor(300/TR))):
+    #    for t in range(int(np.floor(300/TR))):
             #idx = int(np.round((TR * t * fps) + slice_num*(TR/bslice_per_TR)*fps))
-            idx = int(np.round(TR*fps*(t + (slice_num/bslice_per_TR))))
-            slice_frames[:, :, t] = frame_sequence[:, :, idx]
+    #        idx = int(np.round(TR*fps*(t + (slice_num/bslice_per_TR))))
+    #        slice_frames[:, :, t] = frame_sequence[:, :, idx]
 
-        savemat(os.path.join(out_path, task+'_per_TR_slice' + str(slice_num) + '.mat'), {task + '_slice' + str(slice_num): slice_frames.astype('bool')})
+    #    savemat(os.path.join(out_path, task+'_per_TR_slice' + str(slice_num) + '.mat'), {task + '_slice' + str(slice_num): slice_frames.astype('bool')})
 
     '''
     Frames averaged per TR (202 TRs in total to match the number of TRs in a run's bold file)

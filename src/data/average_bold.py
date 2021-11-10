@@ -46,7 +46,8 @@ for sub in sub_list:
 
         # mean epi mask
         mean_epi_mask = intersect_masks(mask_list, threshold=0.3)
-        nib.save(mean_epi_mask, os.path.join(dir_path, 'output', 'masks', sub + '_mean_epi_mask.nii.gz'))
+        #nib.save(mean_epi_mask, os.path.join(dir_path, 'output', 'masks', sub + '_mean_epi_mask.nii.gz'))
+        nib.save(mean_epi_mask, os.path.join(dir_path, 'test', 'masks', sub + '_mean_epi_mask.nii.gz'))
 
         # grey matter (anat) segmentation mask
         anat_path = '/project/rrg-pbellec/datasets/cneuromod_processed/smriprep/' + sub + '/anat'
@@ -54,11 +55,13 @@ for sub in sub_list:
         seg_mask_rs = resample_to_img(seg_mask, mean_epi_mask, interpolation='nearest')
         seg_mask_rs_sm = smooth_img(imgs=seg_mask_rs, fwhm=3)
         GM_mask = nib.nifti1.Nifti1Image((seg_mask_rs_sm.get_fdata() > 0.15).astype('float'), affine=seg_mask_rs_sm.affine)
-        nib.save(GM_mask, os.path.join(dir_path, 'output', 'masks', sub + '_GMmask.nii.gz'))
+        #nib.save(GM_mask, os.path.join(dir_path, 'output', 'masks', sub + '_GMmask.nii.gz'))
+        nib.save(GM_mask, os.path.join(dir_path, 'test', 'masks', sub + '_GMmask.nii.gz'))
 
         # 0 threshold = union, 1 threshold = intersection; accept any voxel included in either mask
         sub_mask = intersect_masks([GM_mask, mean_epi_mask], threshold=0.0)
-        nib.save(sub_mask, os.path.join(dir_path, 'output', 'masks', sub + '_WholeBrain.nii.gz'))
+        #nib.save(sub_mask, os.path.join(dir_path, 'output', 'masks', sub + '_WholeBrain.nii.gz'))
+        nib.save(sub_mask, os.path.join(dir_path, 'test', 'masks', sub + '_WholeBrain.nii.gz'))
 
     else:
         sub_mask = nib.load(os.path.join(dir_path, 'output', 'masks', sub + '_WholeBrain.nii.gz'))
@@ -98,7 +101,8 @@ for sub in sub_list:
             flat_bold_dt = flat_bold_dt[:, 3:]
 
             if args.per_session:
-                savemat(os.path.join(dir_path, 'output', 'detrend', sub + '_epi_FULLbrain_' + task + '_sess' + str(sess_num) +'.mat'), {sub + '_' + task : flat_bold_dt})
+                #savemat(os.path.join(dir_path, 'output', 'detrend', sub + '_epi_FULLbrain_' + task + '_sess' + str(sess_num) +'.mat'), {sub + '_' + task : flat_bold_dt})
+                savemat(os.path.join(dir_path, 'test', 'detrend', sub + '_epi_FULLbrain_' + task + '_sess' + str(sess_num) +'.mat'), {sub + '_' + task : flat_bold_dt})
             else:
                 flatbold_list.append(flat_bold_dt)
 
@@ -109,7 +113,8 @@ for sub in sub_list:
 
             # provides the data as a cell vector of voxels x time. For K.Kay's toolbox, it can also be X x Y x Z x time
             print(mean_bold.shape)
-            savemat(os.path.join(dir_path, 'output', 'detrend', sub + '_epi_FULLbrain_' + task + '.mat'), {sub + '_' + task : mean_bold})
+            #savemat(os.path.join(dir_path, 'output', 'detrend', sub + '_epi_FULLbrain_' + task + '.mat'), {sub + '_' + task : mean_bold})
+            savemat(os.path.join(dir_path, 'test', 'detrend', sub + '_epi_FULLbrain_' + task + '.mat'), {sub + '_' + task : mean_bold})
 
 
 if args.makestim:
@@ -128,4 +133,5 @@ if args.makestim:
             frame = stimuli[:, :, i]
             resized_stim[:, :, i] = resize(frame, target_dim, preserve_range=True, anti_aliasing=True)
 
-        savemat(os.path.join(dir_path, 'stimuli', task + '_per_TR199_192x192.mat'), {task: resized_stim.astype('f4')})
+        #savemat(os.path.join(dir_path, 'stimuli', task + '_per_TR199_192x192.mat'), {task: resized_stim.astype('f4')})
+        savemat(os.path.join(dir_path, 'test', task + '_per_TR199_192x192.mat'), {task: resized_stim.astype('f4')})

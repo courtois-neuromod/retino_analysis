@@ -9,8 +9,14 @@ from nilearn.image import resample_to_img
 from load_confounds import Minimal
 
 from scipy.io import loadmat, savemat
+import argparse
 
-dir_path = '/home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis'
+
+parser = argparse.ArgumentParser(description='Average bold response across retino sessions')
+parser.add_argument('--run_dir', default=None, type=str, help='path to run dir (absolute)')
+args = parser.parse_args()
+
+dir_path = '/home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis' if args.run_dir is None else args.run_dir
 
 sub_list = ['sub-01', 'sub-02', 'sub-03']
 task_list = ['wedges', 'rings', 'bars']
@@ -22,6 +28,8 @@ for sub in sub_list:
         bold = loadmat(os.path.join(dir_path, 'output', 'detrend', sub + '_epi_FULLbrain_' + task + '.mat'))[sub + '_' + task]
 
         num_vox = bold.shape[0]
+        # ideally a multiple of the number of cores (matlab workers) available to process data on elm/ginkco
+        # default for parpool processing set in interface (local profile)
         chunk_size = 240
         '''
         sub-01: 205455 voxels (w inclusive full brain mask)
