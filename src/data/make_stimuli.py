@@ -3,13 +3,36 @@ import numpy as np
 import pandas as pd
 from scipy.io import loadmat, savemat
 
+'''
+For each of the three retinotopy tasks (bars, rings and wedges), a series of frames
+is reconstructed (rate is 15 frames per sec) from the psychopy script and aperture frames (task stimuli)
+
+Frames are then averaged within TR to match the temporal resolution between the stimuli (apertures) and
+the bold signal.
+
+Output is a .mat file that contains a dictionary with a single numpy array with frames per TR (dim 768x768x202 = h, w, f)
+Values are float [0, 1] to consider partial viewing of stimuli within a given pixel within a TR due to aperture movement
+Note that these float stimuli are appropriate for Kendrick Kay's analyzePRF toolbox (on which the cneuromod retino task is based),
+but that several retinotopy toolboxes require binary masks.
+
+Additional script outputs include binary frames (masks) resliced per brain slice (to account for slice-timing)
+
+The psychopy task script lives here:
+https://github.com/courtois-neuromod/task_stimuli/blob/master/src/tasks/retinotopy.py
+
+Stimulus dataset (aperture frames) can be installed in datalad repo with :
+datalad install -d . -s ria+file:///project/rrg-pbellec/ria-beluga#~cneuromod_raw/retinotopy/stimuli --reckless=ephemeral ./retino_stimuli
+'''
+
 tasks = ['bars', 'rings', 'wedges']
 TR = 1.49
 # frames per second
 fps = 15.0
 
 stim_path = '/home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis/data/retinotopy/stimuli'
-out_path = '/home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis/output'
+#out_path = '/home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis/stimuli'
+
+out_path = '/home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis/test'
 
 for task in tasks:
     # frames per task
@@ -31,11 +54,11 @@ for task in tasks:
             task_frames = np.load(os.path.join(stim_path, 'apertures_ring.npz'))['apertures']
 
     print(task_frames.shape)
-    # Normalize to  values between 0 and 1... Current values ranges between 0 and 255
+    # Normalize to values between 0 and 1... Current values ranges between 0 and 255
     scaled_frames = task_frames / 255.0
 
-    # Validated across 3 tasks, over sessions, for 3 subjects
-    # Avg from sub-01, sub-02 and sub-03, ses-002 to ses-006
+    # Onset times validated from task output files across 3 tasks, over 6 sessions, for 3 subjects
+    # Averages in seconds from sub-01, sub-02 and sub-03, ses-002 to ses-006
     onsets = [16.033847, 47.3222376, 78.615124, 109.897517, 153.194802, 184.478802, 215.772451, 247.061259]
 
     # 16 seconds of instructions, 4 cycles of ~32s, 12s pause, 4 cycles of ~32s, 16s of instructions
@@ -56,9 +79,13 @@ for task in tasks:
 
     savemat(os.path.join(out_path, task+'_per_frame.mat'), {task: frame_sequence.astype('bool')})
 
-    # creating a set of frames for a particular slice
-    # 15 = brain slices per TR (60 slices/ TR, with 4 multibands)
-    # 300s / 1.49s = number of TRs (202)
+    '''
+    Create a set of frames for a particular brain slice
+    From the shown frames, the frame that is closest in time to a brain slice's time of acquisition is chosen
+    for that particular slice
+    15 = brain slices per TR (60 slices/ TR, with 4 multibands)
+    300s / 1.49s = number of TRs (202)
+    '''
     bslice_per_TR = 15
 
     total_slices = int(np.floor(300/TR)*15)
@@ -69,6 +96,11 @@ for task in tasks:
         frame_slice[:, :, slice] = frame_sequence[:, :, idx]
 
     savemat(os.path.join(out_path, task+'_per_slice.mat'), {task: frame_slice.astype('bool')})
+    '''
+    Just a different way to reslice the frames: for each brain slice (each of 15),
+    a binary frame is chosen for each TR
+    Outputs 15 different files
+    '''
 
     for slice_num in range(bslice_per_TR):
         slice_frames = np.zeros([768, 768, int(np.floor(300/TR))])
@@ -80,7 +112,9 @@ for task in tasks:
 
         savemat(os.path.join(out_path, task+'_per_TR_slice' + str(slice_num) + '.mat'), {task + '_slice' + str(slice_num): slice_frames.astype('bool')})
 
-    # frames averaged per TR
+    '''
+    Frames averaged per TR (202 TRs in total to match the number of TRs in a run's bold file)
+    '''
     frame_TR = np.zeros([768, 768, int(np.ceil(300/TR))])
 
     for f in range(frame_TR.shape[2]):

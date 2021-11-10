@@ -13,7 +13,7 @@ from load_confounds import Minimal
 from scipy.io import loadmat, savemat
 import argparse
 
-parser = argparse.ArgumentParser(description='Train NIF model')
+parser = argparse.ArgumentParser(description='Average bold response across retino sessions')
 parser.add_argument('--debug', action='store_true', default=False, help='selects fewer voxels from visual cortex')
 args = parser.parse_args()
 

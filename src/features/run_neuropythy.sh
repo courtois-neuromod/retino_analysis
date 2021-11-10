@@ -12,6 +12,7 @@ SUBJECTS_DIR=$CN_SUBJECTS
 SUB_NUM=${1} # 01, 02, 03
 #SUB_NUM=03 # 01, 02, 03
 
+# NOTE: CODE MUST BY RAN FROM INSIDE RUNDIR!!!
 RUNDIR="/project/rrg-pbellec/mstlaure/retino_analysis"
 OUTDIR="${RUNDIR}/results/npythy/sub-${SUB_NUM}"
 INDIR="${RUNDIR}/results/fs/sub-${SUB_NUM}"
