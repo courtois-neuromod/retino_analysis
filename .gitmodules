@@ -6,3 +6,8 @@
 [submodule "popeye"]
 	path = popeye
 	url = git@github.com:kdesimone/popeye.git
+[submodule "data/freesurfer"]
+	path = data/freesurfer
+	url = /lustre03/project/6003287/datasets/cneuromod_processed/smriprep/sourcedata/freesurfer
+	datalad-id = e91589e2-3533-4b78-9bd2-660e2cc26a59
+	datalad-url = /lustre03/project/6003287/datasets/cneuromod_processed/smriprep/sourcedata/freesurfer
