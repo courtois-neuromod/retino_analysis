@@ -87,3 +87,6 @@ target/
 
 # Output files
 output/*
+stimuli/*
+results/*
+data/temp_bold/*
