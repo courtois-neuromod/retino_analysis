@@ -39,8 +39,7 @@ for sub in sub_list:
         sub-03: 197945 voxels (w inclusive full brain mask)
         '''
 
-        #file_path = os.path.join(dir_path, 'output', 'detrend', 'chunks_fullbrain', 's'+ sub[-2:], sub + '_epi_FULLbrain_' + task + '_%04d.mat')
-        file_path = os.path.join(dir_path, 'test', 'detrend', 'chunks_fullbrain', 's'+ sub[-2:], sub + '_epi_FULLbrain_' + task + '_%04d.mat')
+        file_path = os.path.join(dir_path, 'output', 'detrend', 'chunks_fullbrain', 's'+ sub[-2:], sub + '_epi_FULLbrain_' + task + '_%04d.mat')
 
         for i in range(int(np.ceil(num_vox/chunk_size))):
 
