@@ -1,6 +1,5 @@
 import os, glob, json
 import numpy as np
-import pandas as pd
 import nibabel as nib
 import nilearn
 from nilearn.signal import clean
