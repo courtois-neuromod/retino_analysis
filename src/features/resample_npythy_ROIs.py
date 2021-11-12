@@ -8,13 +8,10 @@ import nibabel as nib
 import numpy as np
 from nilearn.image import load_img, new_img_like, index_img, resample_to_img
 from nilearn.masking import intersect_masks, apply_mask, unmask
-#from nipype.interfaces.fsl.maths import TemporalFilter
-#from nipype.pipeline.engine import MapNode
 from scipy.stats import zscore
 from tqdm import tqdm
 
 
-#TODO: adapt Oli's code here
 result_dir = '/project/rrg-pbellec/mstlaure/retino_analysis/results/npythy/sub-03'
 
 # resample binary visual ROIs to functional space

@@ -19,6 +19,8 @@ INDIR="${RUNDIR}/results/fs/sub-${SUB_NUM}"
 
 # Neuropythy Documentation:
 # https://github.com/noahbenson/neuropythy/blob/master/neuropythy/commands/register_retinotopy.py
+# https://github.com/noahbenson/neuropythy
+# https://osf.io/knb5g/wiki/Usage/
 
 # "scale" specifies the strength of the functional forces (subject's retinotopy) relative to anatomical forces (atlas prior) during the registration
 # Higher values will generally result in more warping while lower values will result in less warping. The default value is 20
