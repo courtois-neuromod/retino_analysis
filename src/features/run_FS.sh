@@ -17,7 +17,7 @@ SUBJECTS_DIR=$CN_SUBJECTS
 SUB_NUM=${1} # 01, 02, 03
 #RES_TYPE=${2} # ecc, ang, R2, rfsize, x, y
 
-VOLDIR="/project/rrg-pbellec/mstlaure/retino_analysis/results"
+VOLDIR="/project/rrg-pbellec/mstlaure/retino_analysis/results/analyzePFR"
 OUTDIR="/project/rrg-pbellec/mstlaure/retino_analysis/results/fs"
 
 for RES_TYPE in ang ecc x y R2 rfsize
