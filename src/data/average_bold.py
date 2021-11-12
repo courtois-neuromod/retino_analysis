@@ -18,10 +18,10 @@ parser = argparse.ArgumentParser(description='Average bold response across retin
 parser.add_argument('--makemasks', action='store_true', default=False, help='create masks per subject')
 parser.add_argument('--makestim', action='store_true', default=False, help='process stimuli')
 parser.add_argument('--per_session', action='store_true', default=False, help='exports detrended bold signal separately per session')
-parser.add_argument('--run_dir', default=None, type=str, help='path to run dir (absolute)')
+parser.add_argument('--dir_path', default=None, type=str, help='path to run dir (absolute)')
 args = parser.parse_args()
 
-dir_path = '/home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis' if args.run_dir is None else args.run_dir
+dir_path = '/home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis' if args.dir_path is None else args.dir_path
 
 sub_list = ['sub-01', 'sub-02', 'sub-03']
 task_list = ['wedges', 'rings', 'bars']

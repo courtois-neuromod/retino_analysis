@@ -1,179 +1,210 @@
 import os, glob, json
+
 import numpy as np
 import pandas as pd
 import nibabel as nib
 from nilearn.masking import unmask
-
 from scipy.io import loadmat, savemat
 
-#dir_path = '/home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis'
-dir_path = '/home/mariestl/cneuromod/retinotopy/analyzePRF'
-
-sub = 'sub-01'
-out_list = ['ang', 'ecc', 'expt', 'gain', 'R2', 'rfsize']
+import argparse
 
 
-mask = nib.load(os.path.join(dir_path, 'masks', sub + '_GMmask.nii.gz'))
-mask_dim = mask.get_fdata().shape
+def get_arguments():
 
-num_vox = int(np.sum(mask.get_fdata()))
-chunk_size = 240 # see chunk_bold.py script, line 25
+    parser = argparse.ArgumentParser(description='Average bold response across retino sessions')
+    parser.add_argument('--sub_num', required=True, type=str, help='subject number e.g., sub-01')
+    parser.add_argument('--chunk_size', default=240, type=int, help='number of voxels per chunk')
+    parser.add_argument('--dir_path', default=None, type=str, help='path to run dir (absolute)')
+    parser.add_argument('--threshold', action='store_true', default=False, help='threshold output images with r2 values')
+    args = parser.parse_args()
+
+    return args
 
 
-for out in out_list:
+def reassamble(dir_path, sub, mask, num_vox, chunk_size, out):
 
     flat_output = np.zeros((num_vox,))
-
-    file_path = sorted(glob.glob(os.path.join(dir_path, 'results/sub-03/fullbrain', 'sub' + sub[-2:] + '_GMbrain_analyzePRF_' + out + '_*.mat')))
+    file_path = sorted(glob.glob(os.path.join(dir_path, 'results/analyzePRF/chunked/s' + sub[-2:], 'sub' + sub[-2:] + '_fullbrain_analyzePRF_' + out + '_*.mat')))
 
     for i in range(int(np.ceil(num_vox/chunk_size))):
-
         flat_output[i*chunk_size:(i+1)*chunk_size] = loadmat(file_path[i])[out].reshape(-1,)
 
-    savemat(os.path.join(dir_path, 'results', sub, 'fullbrain', 'sub' + sub[-2:] + '_fullbrain_' + out + '.mat'), {'sub' + sub[-2:] + '_' + out: flat_output})
-        #unflat = unmask(flat_output, mask)
-        #nib.save(unflat, os.path.join(dir_path, 'output', 'results', sub + '_GMmask_' + out + '.nii.gz'))
+    savemat(os.path.join(dir_path, 'results/analyzePRF', 'sub' + sub[-2:] + '_fullbrain_' + out + '.mat'), {'sub' + sub[-2:] + '_' + out: flat_output})
 
-# analysePRF doc (Kendrick Kay)
-# https://github.com/cvnlab/analyzePRF/blob/master/analyzePRF.m
-
-# Neuropythy usage doc:
-# https://osf.io/knb5g/wiki/Usage/
-
-# Variance explained must be a fraction between v such that 0 ≤ v ≤ 1.
-r2 = loadmat(os.path.join(dir_path, 'results', sub, 'GM', 'sub' + sub[-2:] + '_GMmask_R2.mat'))['sub' + sub[-2:] + '_R2'].reshape(-1,)
-# replacing nan by 0
-r2 = np.nan_to_num(r2)/100 # convert percentage
-# Cap between 0 and 1; The R2 values are computed after projecting out polynomials
-# from both the data and the model fit. Because of this projection, values can sometimes drop below 0%
-r2[r2 < 0.0] = 0.0
-r2[r2 > 1.0] = 1.0
-unflat_r2 = unmask(r2, mask)
-nib.save(unflat_r2, os.path.join(dir_path, 'output', 'results', sub + '_GMmask_R2.nii.gz'))
-
-'''
-Convert rfsize from pixel to degrees of visual angle
-The rescaled stimulus is 192x192 pixels for 10 degrees of visual angle (width).
-To convert from pixels to degreees, multiply by 10/192.
-'''
-conv_factor = 10/192
-
-# Sigma/pRF size must be degrees of the visual field (outputed in pixels with 0 lower bound by K Kay's toolbox)
-# stimulus images were rescaled from 768x768 to 192x192, 10 deg of visual angle (width of stimuli)
-rfsize = loadmat(os.path.join(dir_path, 'results', sub, 'GM', 'sub' + sub[-2:] + '_GMmask_rfsize.mat'))['sub' + sub[-2:] + '_rfsize'].reshape(-1,)
-# removing np.inf values and replacing w max finite value
-rfs_max = np.max(rfsize[np.isfinite(rfsize)])
-rfsize[rfsize == np.inf] = rfs_max
-# thresholding to significant voxels... (only for visualization)
-# rfsize = rfsize*(r2 > 0.1)
-'''
-With gaussian mmodel, rfsize is sigma; KK's model is slightly different
-In KK's: rfsize = sigma/sqrt(n) where n is the exponent of the power law function
-expt contains pRF exponent estimates (is that n???).
-Similar to the original model (2D isotropic Gaussian), except that a
-static power-law nonlinearity is added after summation across the visual field
-
-# Recover sigma from size? (Not NEEDED)
-From paper: https://journals.physiology.org/doi/full/10.1152/jn.00105.2013
-"For a model for which the predicted response to point stimuli does not have a
-Gaussian profile, we could simply stipulate that pRF size is the standard
-deviation of a Gaussian function fitted to the actual profile."
-
-expt = loadmat(os.path.join(dir_path, 'results', sub, 'GM', 'sub' + sub[-2:] + '_GMmask_expt.mat'))['sub' + sub[-2:] + '_expt'].reshape(-1,)
-sigma = rfsize*np.sqrt(expt)
-'''
-rfsize = rfsize*conv_factor
-unflat_rfsize = unmask(rfsize, mask)
-nib.save(unflat_rfsize, os.path.join(dir_path, 'output', 'results', sub + '_GMmask_rfsize.nii.gz'))
+    #unflat = unmask(flat_output, mask)
+    #nib.save(unflat, os.path.join(dir_path, 'results/analyzePRF', sub + '_fullbrain_' + out + '.nii.gz'))
 
 
-# Values are in pixel units with a lower bound of 0 pixels. Must be in degrees of visual angle from the fovea.
-ecc = loadmat(os.path.join(dir_path, 'results', sub, 'GM', 'sub' + sub[-2:] + '_GMmask_ecc.mat'))['sub' + sub[-2:] + '_ecc'].reshape(-1,)
-# Values range between 0 and 360 degrees.
-# 0 corresponds to the right horizontal meridian, 90 corresponds to the upper vertical meridian, and so on.
-# In the case where <ecc> is estimated to be exactly equal to 0,
-# the corresponding <ang> value is deliberately set to NaN.
-ang = loadmat(os.path.join(dir_path, 'results', sub, 'GM', 'sub' + sub[-2:] + '_GMmask_ang.mat'))['sub' + sub[-2:] + '_ang'].reshape(-1,)
-x = np.cos(np.radians(ang))*ecc
-y = np.sin(np.radians(ang))*ecc
+def get_r2(dir_path, sub, mask):
+    '''
+    Adapts K Kay's analyzePRF R^2 values from analyzePRF for Neuropythy
+    AnalyzePRF exports R^2 as val between ~0 (some vals negative) and ~100
 
-# convert to visual angles
-ecc *= conv_factor
-x *= conv_factor
-y *= conv_factor
+    "The R2 values are computed after projecting out polynomials from both
+    the data and the model fit. Because of this projection, values can
+    sometimes drop below 0%"
 
-# converts angles from "compass" to "signed north-south" for neuropythy
-ang[np.logical_not(ang > 270)] = 90 - ang[np.logical_not(ang > 270)]
-ang[ang > 270] = 450 - ang[ang > 270]
+    Neuropythy : variance explained must be a fraction between v such that 0 ≤ v ≤ 1
+    '''
+    r2 = loadmat(os.path.join(dir_path, 'results/analyzePRF', 'sub' + sub[-2:] + '_fullbrain_R2.mat'))['sub' + sub[-2:] + '_R2'].reshape(-1,)
+    # replace nan by 0
+    r2 = np.nan_to_num(r2)/100 # convert percentage
+    # Cap values between 0 and 1
+    r2[r2 < 0.0] = 0.0
+    r2[r2 > 1.0] = 1.0
+    unflat_r2 = unmask(r2, mask)
+    nib.save(unflat_r2, os.path.join(dir_path, 'results/analyzePRF', sub + '_fullbrain_R2.nii.gz'))
 
-# From readme: angle values must be absolute for neurpythy (Doc is not up to date in Usage manual)
-# https://github.com/noahbenson/neuropythy/issues?q=is%3Aissue+is%3Aclosed
-ang = np.absolute(ang)
-
-# threshold for visualization
-#ecc = ecc*(r2 > 0.1)
-#ang = ang*(r2 > 0.1)
-#x = x*(r2 > 0.1)
-#y = y*(r2 > 0.1)
-
-unflat_ecc = unmask(ecc, mask)
-unflat_ang = unmask(ang, mask)
-unflat_x = unmask(x, mask)
-unflat_y = unmask(y, mask)
-
-nib.save(unflat_ecc, os.path.join(dir_path, 'output', 'results', sub + '_GMmask_ecc.nii.gz'))
-nib.save(unflat_ang, os.path.join(dir_path, 'output', 'results', sub + '_GMmask_ang.nii.gz'))
-nib.save(unflat_x, os.path.join(dir_path, 'output', 'results', sub + '_GMmask_x.nii.gz'))
-nib.save(unflat_y, os.path.join(dir_path, 'output', 'results', sub + '_GMmask_y.nii.gz'))
+    return r2
 
 
+def get_rfsize(dir_path, sub, conv_factor, mask, r2, threshold):
+    '''
+    With a standard 2D isotropic gaussian model, rfsize corresponds to sigma
 
-'''
-bbbbbbbbb
-'''
+    The analyzePRF model is slightly different:
+        rfsize = sigma/sqrt(n) where n is the exponent of the power law function;
+        output 'expt' contains pRF exponent estimates (is that n???).
 
-dir_path = '/home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis'
-sub = 'sub-03'
-mask = nib.load(os.path.join(dir_path, 'output', 'masks', sub + '_WholeBrain.nii.gz'))
+        Similar to the original model (gaussian), except that a static
+        power-law nonlinearity is added after summation across the visual field.
 
-r2 = loadmat(os.path.join(dir_path, 'results', 'sub' + sub[-2:] + '_fullbrain_R2.mat'))['sub' + sub[-2:] + '_R2'].reshape(-1,)
-r2 = np.nan_to_num(r2)/100 # convert percentage
-r2[r2 < 0.0] = 0.0
-r2[r2 > 1.0] = 1.0
-unflat_r2 = unmask(r2, mask)
-nib.save(unflat_r2, os.path.join(dir_path, 'results', sub + '_fullbrain_R2.nii.gz'))
+        Question: do we need to recalculate sigma from size?
+        e.g., sigma = rfsize*np.sqrt(expt)
+        (NO! Use outputed rfsize as-is as if it were sigma)
+        From paper: https://journals.physiology.org/doi/full/10.1152/jn.00105.2013
 
-conv_factor = 10/192
+        "For a model for which the predicted response to point stimuli does not
+        have a Gaussian profile, we could simply stipulate that pRF size is the
+        standard deviation of a Gaussian function fitted to the actual profile."
 
-rfsize = loadmat(os.path.join(dir_path, 'results', 'sub' + sub[-2:] + '_fullbrain_rfsize.mat'))['sub' + sub[-2:] + '_rfsize'].reshape(-1,)
-rfs_max = np.max(rfsize[np.isfinite(rfsize)])
-rfsize[rfsize == np.inf] = rfs_max
+    AnalyzePRF: rfsize is in pixels with 0 lower bound. Stimulus images were
+                rescaled from 768x768 to 192x192, which correspond to
+                10 deg of visual angle (width of on-screen stimuli)
+    Neuropythy: Sigma/pRF size must be in degrees of the visual field
+    '''
+    rfsize = loadmat(os.path.join(dir_path, 'results', 'sub' + sub[-2:] + '_fullbrain_rfsize.mat'))['sub' + sub[-2:] + '_rfsize'].reshape(-1,)
+    # remove np.inf values and replace w max finite value
+    rfs_max = np.max(rfsize[np.isfinite(rfsize)])
+    rfsize[rfsize == np.inf] = rfs_max
 
-rfsize = rfsize*conv_factor
-unflat_rfsize = unmask(rfsize, mask)
-nib.save(unflat_rfsize, os.path.join(dir_path, 'results', sub + '_fullbrain_rfsize.nii.gz'))
+    # threshold image to only significant voxels (only for visualization)
+    if threshold:
+        rfsize = rfsize*(r2 > 0.1)
+
+    # convert from pixels to degres of vis angle
+    rfsize = rfsize*conv_factor
+
+    unflat_rfsize = unmask(rfsize, mask)
+    nib.save(unflat_rfsize, os.path.join(dir_path, 'results', sub + '_fullbrain_rfsize.nii.gz'))
 
 
-ecc = loadmat(os.path.join(dir_path, 'results', 'sub' + sub[-2:] + '_fullbrain_ecc.mat'))['sub' + sub[-2:] + '_ecc'].reshape(-1,)
-ang = loadmat(os.path.join(dir_path, 'results', 'sub' + sub[-2:] + '_fullbrain_ang.mat'))['sub' + sub[-2:] + '_ang'].reshape(-1,)
-x = np.cos(np.radians(ang))*ecc
-y = np.sin(np.radians(ang))*ecc
+def get_angles_and_ecc(dir_path, sub, conv_factor, mask, r2, threshold):
+    '''
+    AnalyzePRF: angle and eccentricity values are in pixel units with a lower bound of 0 pixels.
+    Neuropythy: values must be in degrees of visual angle from the fovea.
+    '''
+    ecc = loadmat(os.path.join(dir_path, 'results', 'sub' + sub[-2:] + '_fullbrain_ecc.mat'))['sub' + sub[-2:] + '_ecc'].reshape(-1,)
+    ang = loadmat(os.path.join(dir_path, 'results', 'sub' + sub[-2:] + '_fullbrain_ang.mat'))['sub' + sub[-2:] + '_ang'].reshape(-1,)
+    # calculate x and y coordinates (in pixels)
+    x = np.cos(np.radians(ang))*ecc
+    y = np.sin(np.radians(ang))*ecc
 
-ecc *= conv_factor
-x *= conv_factor
-y *= conv_factor
+    # convert from pixels to degress of visual angle
+    ecc *= conv_factor
+    x *= conv_factor
+    y *= conv_factor
 
-ang[np.logical_not(ang > 270)] = 90 - ang[np.logical_not(ang > 270)]
-ang[ang > 270] = 450 - ang[ang > 270]
+    '''
+    AnalyzePRF: angle values range between 0 and 360 degrees.
+    0 corresponds to the right horizontal meridian, 90 corresponds to the upper vertical meridian, and so on.
+    In the case where <ecc> is estimated to be exactly equal to 0,
+    the corresponding <ang> value is deliberately set to NaN.
 
-ang = np.absolute(ang)
+    Neuropythy: Angle values vary from 0-180.
+    Values must be absolute (the doc is not up to date in the Usage manual; repo's readme must up to date)
+    0 represents the upper vertical meridian and 180 represents the lower vertical meridian in both hemifields.
+    Positive values refer to the right visual hemi-field for the left hemisphere, and vice versa.
 
-unflat_ecc = unmask(ecc, mask)
-unflat_ang = unmask(ang, mask)
-unflat_x = unmask(x, mask)
-unflat_y = unmask(y, mask)
+    https://github.com/noahbenson/neuropythy/issues?q=is%3Aissue+is%3Aclosed
+    '''
+    # converts angles from "compass" to "signed north-south" for neuropythy
+    ang[np.logical_not(ang > 270)] = 90 - ang[np.logical_not(ang > 270)]
+    ang[ang > 270] = 450 - ang[ang > 270]
+    ang = np.absolute(ang)
 
-nib.save(unflat_ecc, os.path.join(dir_path, 'results', sub + '_fullbrain_ecc.nii.gz'))
-nib.save(unflat_ang, os.path.join(dir_path, 'results', sub + '_fullbrain_ang.nii.gz'))
-nib.save(unflat_x, os.path.join(dir_path, 'results', sub + '_fullbrain_x.nii.gz'))
-nib.save(unflat_y, os.path.join(dir_path, 'results', sub + '_fullbrain_y.nii.gz'))
+    # only for visualization
+    if threshold:
+        ecc = ecc*(r2 > 0.1)
+        ang = ang*(r2 > 0.1)
+        x = x*(r2 > 0.1)
+        y = y*(r2 > 0.1)
+
+    unflat_ecc = unmask(ecc, mask)
+    unflat_ang = unmask(ang, mask)
+    unflat_x = unmask(x, mask)
+    unflat_y = unmask(y, mask)
+
+    nib.save(unflat_ecc, os.path.join(dir_path, 'results', sub + '_fullbrain_ecc.nii.gz'))
+    nib.save(unflat_ang, os.path.join(dir_path, 'results', sub + '_fullbrain_ang.nii.gz'))
+    nib.save(unflat_x, os.path.join(dir_path, 'results', sub + '_fullbrain_x.nii.gz'))
+    nib.save(unflat_y, os.path.join(dir_path, 'results', sub + '_fullbrain_y.nii.gz'))
+
+
+if __name__ == '__main__':
+    '''
+    Script takes 1D chunks (voxels,) of analyzePRF output metrics,
+    re-concatenates them in order, formats them for neuropythy toolbox
+    and unmasks/exports them into brain volumes (nii.gz)
+
+    AnalyzePRF doc (Kendrick Kay's retinotopy toolbox on which CNeuromod retino task was based)
+    https://github.com/cvnlab/analyzePRF/blob/master/analyzePRF.m
+
+    Neuropythy doc:
+    https://github.com/noahbenson/neuropythy
+    https://osf.io/knb5g/wiki/Usage/
+    '''
+    args = get_arguments()
+
+    # On Beluga
+    dir_path = '/home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis' if args.dir_path is None else args.dir_path
+    # On elm/ginkgo
+    #dir_path = '/home/mariestl/cneuromod/retinotopy/analyzePRF' if args.dir_path is None else args.dir_path
+
+    sub = args.sub_num # format = 'sub-01'
+
+    out_list = ['ang', 'ecc', 'expt', 'gain', 'R2', 'rfsize']
+
+    # Load mask used to vectorize the detrended bold data
+    mask = nib.load(os.path.join(dir_path, 'output/masks', sub + '_WholeBrain.nii.gz'))
+    mask_dim = mask.get_fdata().shape
+
+    '''
+    As a reference...
+    Number of voxels within "Whole Brain" mask outputed by average_bold.py, per participant
+    sub-01: 205455 voxels (w inclusive full brain mask)
+    sub-02: 221489 voxels (w inclusive full brain mask)
+    sub-03: 197945 voxels (w inclusive full brain mask)
+    '''
+    num_vox = int(np.sum(mask.get_fdata()))
+    chunk_size = args.chunk_size # see chunk_bold.py script, line 34
+
+    # re-concatenate chunked voxels and unmask into brain volume (subject's T1w)
+    # all files are exported by the function
+    for out in out_list:
+        reassamble(dir_path, sub, mask, num_vox, chunk_size, out)
+
+    # load, process and save volume of R^2 Values
+    r2 = get_r2(dir_path, sub, mask)
+
+    '''
+    Convert rfsize, x and y from pixel to degrees of visual angle
+    The rescaled stimulus is 192x192 pixels for 10 degrees of visual angle (width).
+    To convert from pixels to degreees, multiply by 10/192.
+    '''
+    conv_factor = 10/192
+
+    # load, process and save volumes of population receptive field size,
+    # angle, eccentricity, and x and y coordinate values
+    get_rfsize(dir_path, sub, conv_factor, mask, r2, args.threshold)
+    get_angles_and_ecc(dir_path, sub, conv_factor, mask, r2, args.threshold)
