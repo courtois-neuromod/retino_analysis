@@ -10,7 +10,7 @@ workon retino_analysis
 CN_SUBJECTS="/home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis/data/freesurfer"
 SUBJECTS_DIR=$CN_SUBJECTS
 
-SUB_NUM=${1} # 01, 02, 03
+SUB_NUM="${1}" # 01, 02, 03
 
 # NOTE: THE SCRIPT MUST BY RAN DIRECTLY INSIDE RUNDIR!!!
 RUNDIR="/project/rrg-pbellec/mstlaure/retino_analysis"
