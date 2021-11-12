@@ -1,9 +1,7 @@
-#module load freesurfer/5.3.0
+
 module load freesurfer/7.1.1
-#source $EBROOTFREESURFER/FreeSurferEnv.sh
 
-# ex to run: ./run_FS.sh 01 rfsize
-
+# ex to run script: ./run_FS.sh 01 rfsize
 workon retino_analysis
 
 # set $SUBJECTS_DIR to cneuromod freesurfer data directory
