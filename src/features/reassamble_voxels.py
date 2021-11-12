@@ -27,7 +27,7 @@ def reassamble(dir_path, sub, mask, num_vox, chunk_size, out):
     file_path = sorted(glob.glob(os.path.join(dir_path, 'results/analyzePRF/chunked/s' + sub[-2:], 'sub' + sub[-2:] + '_fullbrain_analyzePRF_' + out + '_*.mat')))
 
     for i in range(int(np.ceil(num_vox/chunk_size))):
-        print(out, i)
+        #print(out, i)
         flat_output[i*chunk_size:(i+1)*chunk_size] = loadmat(file_path[i])[out].reshape(-1,)
 
     savemat(os.path.join(dir_path, 'results/analyzePRF', 'sub' + sub[-2:] + '_fullbrain_' + out + '.mat'), {'sub' + sub[-2:] + '_' + out: flat_output})
@@ -189,7 +189,7 @@ if __name__ == '__main__':
     '''
     num_vox = int(np.sum(mask.get_fdata()))
     chunk_size = args.chunk_size # see chunk_bold.py script, line 34
-    print(num_vox, chunk_size)
+    #print(num_vox, chunk_size)
 
     # re-concatenate chunked voxels and unmask into brain volume (subject's T1w)
     # all files are exported by the function
