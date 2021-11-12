@@ -15,7 +15,7 @@ def get_arguments():
     parser.add_argument('--sub_num', required=True, type=str, help='subject number e.g., sub-01')
     parser.add_argument('--chunk_size', default=240, type=int, help='number of voxels per chunk')
     parser.add_argument('--dir_path', default=None, type=str, help='path to run dir (absolute)')
-    parser.add_argument('--threshold', action='store_true', default=False, help='threshold output images with r2 values')
+    parser.add_argument('--threshold', action='store_true', default=False, help='threshold all output images using r2 values for visualization')
     args = parser.parse_args()
 
     return args
@@ -83,7 +83,7 @@ def get_rfsize(dir_path, sub, conv_factor, mask, r2, threshold):
                 10 deg of visual angle (width of on-screen stimuli)
     Neuropythy: Sigma/pRF size must be in degrees of the visual field
     '''
-    rfsize = loadmat(os.path.join(dir_path, 'results', 'sub' + sub[-2:] + '_fullbrain_rfsize.mat'))['sub' + sub[-2:] + '_rfsize'].reshape(-1,)
+    rfsize = loadmat(os.path.join(dir_path, 'results/analyzePRF', 'sub' + sub[-2:] + '_fullbrain_rfsize.mat'))['sub' + sub[-2:] + '_rfsize'].reshape(-1,)
     # remove np.inf values and replace w max finite value
     rfs_max = np.max(rfsize[np.isfinite(rfsize)])
     rfsize[rfsize == np.inf] = rfs_max
@@ -96,7 +96,7 @@ def get_rfsize(dir_path, sub, conv_factor, mask, r2, threshold):
     rfsize = rfsize*conv_factor
 
     unflat_rfsize = unmask(rfsize, mask)
-    nib.save(unflat_rfsize, os.path.join(dir_path, 'results', sub + '_fullbrain_rfsize.nii.gz'))
+    nib.save(unflat_rfsize, os.path.join(dir_path, 'results/analyzePRF', sub + '_fullbrain_rfsize.nii.gz'))
 
 
 def get_angles_and_ecc(dir_path, sub, conv_factor, mask, r2, threshold):
@@ -104,8 +104,8 @@ def get_angles_and_ecc(dir_path, sub, conv_factor, mask, r2, threshold):
     AnalyzePRF: angle and eccentricity values are in pixel units with a lower bound of 0 pixels.
     Neuropythy: values must be in degrees of visual angle from the fovea.
     '''
-    ecc = loadmat(os.path.join(dir_path, 'results', 'sub' + sub[-2:] + '_fullbrain_ecc.mat'))['sub' + sub[-2:] + '_ecc'].reshape(-1,)
-    ang = loadmat(os.path.join(dir_path, 'results', 'sub' + sub[-2:] + '_fullbrain_ang.mat'))['sub' + sub[-2:] + '_ang'].reshape(-1,)
+    ecc = loadmat(os.path.join(dir_path, 'results/analyzePRF', 'sub' + sub[-2:] + '_fullbrain_ecc.mat'))['sub' + sub[-2:] + '_ecc'].reshape(-1,)
+    ang = loadmat(os.path.join(dir_path, 'results/analyzePRF', 'sub' + sub[-2:] + '_fullbrain_ang.mat'))['sub' + sub[-2:] + '_ang'].reshape(-1,)
     # calculate x and y coordinates (in pixels)
     x = np.cos(np.radians(ang))*ecc
     y = np.sin(np.radians(ang))*ecc
@@ -145,10 +145,10 @@ def get_angles_and_ecc(dir_path, sub, conv_factor, mask, r2, threshold):
     unflat_x = unmask(x, mask)
     unflat_y = unmask(y, mask)
 
-    nib.save(unflat_ecc, os.path.join(dir_path, 'results', sub + '_fullbrain_ecc.nii.gz'))
-    nib.save(unflat_ang, os.path.join(dir_path, 'results', sub + '_fullbrain_ang.nii.gz'))
-    nib.save(unflat_x, os.path.join(dir_path, 'results', sub + '_fullbrain_x.nii.gz'))
-    nib.save(unflat_y, os.path.join(dir_path, 'results', sub + '_fullbrain_y.nii.gz'))
+    nib.save(unflat_ecc, os.path.join(dir_path, 'results/analyzePRF', sub + '_fullbrain_ecc.nii.gz'))
+    nib.save(unflat_ang, os.path.join(dir_path, 'results/analyzePRF', sub + '_fullbrain_ang.nii.gz'))
+    nib.save(unflat_x, os.path.join(dir_path, 'results/analyzePRF', sub + '_fullbrain_x.nii.gz'))
+    nib.save(unflat_y, os.path.join(dir_path, 'results/analyzePRF', sub + '_fullbrain_y.nii.gz'))
 
 
 if __name__ == '__main__':
