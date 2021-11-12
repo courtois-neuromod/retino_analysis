@@ -15,7 +15,6 @@ CN_SUBJECTS="/home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis/data/f
 SUBJECTS_DIR=$CN_SUBJECTS
 
 SUB_NUM=${1} # 01, 02, 03
-#RES_TYPE=${2} # ecc, ang, R2, rfsize, x, y
 
 VOLDIR="/project/rrg-pbellec/mstlaure/retino_analysis/results/analyzePRF"
 OUTDIR="/project/rrg-pbellec/mstlaure/retino_analysis/results/fs"
