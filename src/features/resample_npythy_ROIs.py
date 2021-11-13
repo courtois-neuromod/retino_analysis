@@ -74,26 +74,8 @@ if __name__ == '__main__':
     for roival in range(1, 13):
         export_map(roival, va, va_img, ref_img, result_dir)
 
-    # resample and save all other neuropythy outputs 
+    # resample and save all other neuropythy outputs
     for param in ['angle', 'eccen', 'sigma', 'varea']:
         interp = 'nearest' if param == 'varea' else 'linear'
         res_img = resample_to_img(os.path.join(result_dir, f'inferred_{param}.nii.gz'), ref_img, interpolation=interp)
         res_img.to_filename(os.path.join(result_dir, f'resampled_{param}.nii.gz'))
-
-
-'''
-roival=12
-roi_arr = np.zeros(va.shape)
-roi_arr[np.where(va == roival)] = 1.
-roi_img = new_img_like(va_img, roi_arr)
-res_img = resample_to_img(roi_img, ref_img, interpolation='nearest')
-res_img.to_filename(os.path.join(result_dir, f'resampled_va-{roival}_interp-nn.nii.gz'))
-# also save linear interpolation for convenience
-lres_img = resample_to_img(roi_img, ref_img, interpolation='linear')
-lres_img.to_filename(os.path.join(result_dir, f'resampled_va-{roival}_interp-linear.nii.gz'))
-
-
-interp = 'nearest' if param == 'varea' else 'linear'
-res_img = resample_to_img(os.path.join(result_dir, f'inferred_{param}.nii.gz'), ref_img, interpolation=interp)
-res_img.to_filename(os.path.join(result_dir, f'resampled_{param}.nii.gz'))
-'''
