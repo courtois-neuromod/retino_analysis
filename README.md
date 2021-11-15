@@ -152,6 +152,28 @@ To run (where "01" is the subject number):
 **Input**: freesurfer flat maps of retinotopy metrics \
 **Output**: Inferred retinotopy flat maps (based on atlas prior and subject's own retinotopy data) and region of interest labels (e.g., lh.inferred_varea.mgz)
 
+------------
+**Step 8. Reorient and resample neuropythy output maps and project the results back into T1w volume space**
+
+**First**: re-orient the neuropythy output with mri_convert and fsl
+Script: src/features/reorient_npythy.sh
+```bash
+./src/features/reorient_npythy.sh 01 
+```
+Notes: 
+- this script needs to run from within the subject’s freesurfer "MRI" directory (hence the "cd") so it knows where to find freesurfer files.
+- on Compute Canada, the script prompts to specify which module versions to use; chose option 2 : fsl/6.0.3 StdEnv/2020 gcc/9.3.0
+
+**Second**: Resample binary visual ROIs to T1w functional space
+Script: src/features/resample_npythy_ROIs.py
+Before running, load project's virtual env with **workon retino_analysis** (on beluga)
+```bash
+python -m src.features.resample_npythy_ROIs –sub_num=”sub-01”
+```
+
+**Input**: Inferred retinotopy flat maps \
+**Output**: NIfTI volumes of retinotopy results adjuted from atlas prior, and inferred regions of interest (binary mask for V1, V2, V3, hV4, V01, V02, L01, L02, T01, T02, V3b and V3a) in T1w space
+
 --------
 
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
