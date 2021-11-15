@@ -3,6 +3,8 @@ retino_analysis
 
 Retinotopy Analysis Pipeline
 ------------
+Author: Marie St-Laurent \
+With thanks to Basile Pinsard (psychopy and data preprocessing) and Oliver Contier (freesurfer and neuropythy pipeline).
 
 Note: with the exception of the retinotopy analysis, which I ran in matlab on elm/ginkgo with the analyzePRF toolbox, all other scripts/steps are ran on Compute Canada cluster node from my project's repo:
 home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis.
@@ -119,7 +121,7 @@ python m src/features/reassamble_voxels.py --sub_num=”sub-03”
 Notes: 
 - this step requires access to fmriprep freesurfer output
 - I installed freesurfer locally in my home directory, following Compute Canada [guidelines](https://docs.computecanada.ca/wiki/FreeSurfer)
-- The $SUBJECTS_DIR variable must be set to path to the directory where cneuromod subjects' freesurfer output is saved
+- The $SUBJECTS_DIR variable must be set to the path to the directory where cneuromod subjects' freesurfer output is saved
 
 Script: src/features/run_FS.sh
 To run (where "01" is the subject number):
@@ -130,6 +132,25 @@ To run (where "01" is the subject number):
 **Input**: Brain volumes of retinotopy metrics in T1w space \
 **Output**: freesurfer flat maps (one per hemisphere per metric). e.g., lh.s01_prf_ang.mgz & rh.s01_prf_ang.mgz
 
+
+------------
+**Step 7. Process flat maps with neuropythy toolbox**
+
+The Neuropythy toolbox estimates regions of interest based on a single subject's retinotopy results, plus a prior of ROIs estimated from the HCP project. 
+Neuropythy [repo](https://github.com/noahbenson/neuropythy) and [command line arguments](https://github.com/noahbenson/neuropythy/blob/master/neuropythy/commands/register_retinotopy.py); Neuropythy [user manual](https://osf.io/knb5g/wiki/Usage/).
+
+Notes: 
+- this step requires to load java and freesurfer modules; $SUBJECTS_DIR needs to be specified just like in step 6.
+- There is a Visible Deprecation Warning that appears with newer versions of numpy that do not affect the output. [Filed repo issue here.](https://github.com/noahbenson/neuropythy/issues/24)
+
+Script: src/features/run_neuropythy.sh
+To run (where "01" is the subject number):
+```bash
+./src/features/run_neuropythy.sh 01
+```
+
+**Input**: freesurfer flat maps of retinotopy metrics \
+**Output**: Inferred retinotopy flat maps (based on atlas prior and subject's own retinotopy data) and region of interest labels (e.g., lh.inferred_varea.mgz)
 
 --------
 
