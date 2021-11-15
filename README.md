@@ -20,7 +20,7 @@ python -m src.data.make_stimuli
 **Output**: Binary aperture masks are averaged within each TR to obtain a temporal sequence of aperture frames (floats [0, 1]) for each TR. 
 
 ------------
-**Step 2. Pre-process bold data and stimuli for analyzepRF toolbox**
+**Step 2. Pre-process bold data and stimuli for the analyzepRF toolbox**
 
 Script: src/data/average_bold.py
 
@@ -40,7 +40,53 @@ python -m src.data.average_bold.py –-makemasks –-makestim --per_session
 - Whole-brain subject masks made from subject's epi masks (one per session for each task) and from a grey matter anatomical mask outputted by freesurfer
 - Detrended and normalized bold runs averaged per task across 5/6 sessions; saved as a 1D flattened masked array inside a .mat file
 
+------------
+**Step 3. Chunk flattened and detrended brain voxels into segments that load easily into matlabx**
 
+AnalyzePRF processes each voxel individually, which is maddeningly slow. Chunks allow to run the pipeline in parallel from different machines (e.g., elm and ginkgo) to speed up the process. 
+
+Script: src/data/chunk_bold.py
+
+Ideally, set chunk_size argument (which sets the number of voxels per chunk) to be a multiple of the number of matlab workers available on elm/ginkgo
+```bash
+python -m src.data.chunk_bold –chunk_size=240
+```
+Note to self: Make sure to generate separate individual subject directories in which to save the 800+ chunks (s01, s02...)
+
+
+**Input**: Detrended and masked voxels processed with average_bold.py \
+**Output**: Chunks of detrended and flattened voxels to load in matlab (~850 .mat files for >200k voxels), dim = (voxels, TR)
+
+------------
+**Step 4. AnalyzePRF toolbox**
+
+Transfer data (chunks and resized stimuli) from Compute Canada to elm/ginkgo, and process it through Kendrick Kay’s AnalyzePRF retinotopy toolbox (in matlab). Toolbox repo [here](https://github.com/cvnlab/analyzePRF); Toolbox documentation/examples [here](http://kendrickkay.net/analyzePRF/).
+
+Notes: 
+- Matlab version: R2021a Update 5 (9.10.0.1739362) 64-bit (glnxa64) is installed on elm/ginkgo with UdeM license
+- On elm/ginkgo, I have a downloaded a copy of the analyze_pFR toolbox code locally from the repo (it's not a repo though) in /home/mariestl/cneuromod/retinotopy/analyzePRF
+
+Do:
+- Copy the stimuli (e.g., rings_per_TR199_192x192.mat) in /home/mariestl/cneuromod/retinotopy/analyzePRF/data
+- Copy chunks files from beluga home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis/output/detrend/chunks_fullbrain/s0* into elm/ginkgo /home/mariestl/cneuromod/retinotopy/analyzePRF/data/chunks/sub-0*/fullbrain
+- Modify scripts **run_analyzePRF_elm.m** and **run_analyzePRF_ginkgo.m** to determine which subject to run, and which series of chunks to process on which server; the chunk numbers called by the script are determined by the for loop (line 42). (Note: this is not a local repo, those scripts are copied and modified locally & manually)
+- AnalyzePRF results (sets of metrics for each chunk) are saved in /home/mariestl/cneuromod/retinotopy/analyzePRF/results/sub-0*/fullbrain
+
+Generic copy of the script that calls analyzePRF: src/features/run_analyzePRF.m \
+Example bash script to call run_analyzePRF.m from the console: src/features/call_analyze_script.sh
+
+- Run the script inside a detachable tmux session (it will take > 24h for an entire brain with 50 workers)
+E.g., 
+```bash
+tmux
+module load matlab
+matlab -nodisplay -nosplash -nodesktop -r "run('run_analyzePRF_elm.m'); exit;"
+```
+
+Note to self: The number of workers used by parpool for parallel processing is determined by availability, up to the default set in the "local" profile. Launching the matlab interface and changing that default (bottom left green flashing button) allows to modify it. The parallel workers are called in the toolbox code by default.
+
+**Input**: Chunks of detrended voxels  \
+**Output**: Population receptive field metrics estimated for each voxel, saved per chunk
 
 --------
 
