@@ -22,6 +22,8 @@ python -m src.data.make_stimuli
 ------------
 **Step 2. Pre-process bold data and stimuli for the analyzepRF toolbox**
 
+Note: processes data from multiple participants.
+
 Script: src/data/average_bold.py
 
 To average bold data across sessions, per task, for each participant (one file per task =  3 bold files)
@@ -43,6 +45,8 @@ python -m src.data.average_bold.py –-makemasks –-makestim --per_session
 ------------
 **Step 3. Chunk flattened and detrended brain voxels into segments that load easily into matlabx**
 
+Note: processes data from multiple participants.
+
 AnalyzePRF processes each voxel individually, which is maddeningly slow. Chunks allow to run the pipeline in parallel from different machines (e.g., elm and ginkgo) to speed up the process. 
 
 Script: src/data/chunk_bold.py
@@ -59,6 +63,8 @@ Note to self: Make sure to generate separate individual subject directories in w
 
 ------------
 **Step 4. AnalyzePRF toolbox**
+
+Note: processes a single participant at a time, very slowly.
 
 Transfer data (chunks and resized stimuli) from Compute Canada to elm/ginkgo, and process it through Kendrick Kay’s AnalyzePRF retinotopy toolbox (in matlab). Toolbox repo [here](https://github.com/cvnlab/analyzePRF); Toolbox documentation/examples [here](http://kendrickkay.net/analyzePRF/).
 
@@ -87,6 +93,24 @@ Note to self: The number of workers used by parpool for parallel processing is d
 
 **Input**: Chunks of detrended voxels  \
 **Output**: Population receptive field metrics estimated for each voxel, saved per chunk
+
+------------
+**Step 5. Reconstruct chunked output files into brain volumes and pre-process metrics for Neuropythy toolbox**
+
+Copy the chunked results files from elm/ginkgo:/ /home/mariestl/cneuromod/retinotopy/analyzePRF/results/sub-0*/fullbrain 
+into beluga:/home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis/results/analyzePRF/chunked/s0*
+
+Then, reassemble the chunked output files into brain volumes and adapt them for Neuropythy. \
+Neuropythy repo [here](https://github.com/noahbenson/neuropythy); Neuropythy user manual [here](https://osf.io/knb5g/wiki/Usage/).\
+Note: processes a single participant's data at a time.
+
+Script: src/features/reassamble_voxels.py
+```bash
+python m src/features/reassamble_voxels.py --sub_num=”sub-03” 
+```
+
+**Input**: Chunks of retinotopy metrics saved as 1D arrays in .mat file \
+**Output**: Brain volumes of retinotopy metrics in T1w space
 
 --------
 
