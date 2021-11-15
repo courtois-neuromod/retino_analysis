@@ -112,6 +112,25 @@ python m src/features/reassamble_voxels.py --sub_num=”sub-03”
 **Input**: Chunks of retinotopy metrics saved as 1D arrays in .mat file \
 **Output**: Brain volumes of retinotopy metrics in T1w space
 
+
+------------
+**Step 6. Convert retinotopy output maps from T1w volumes into flat maps with freesurfer**
+
+Notes: 
+- this step requires access to fmriprep freesurfer output
+- I installed freesurfer locally in my home directory, following Compute Canada [guidelines](https://docs.computecanada.ca/wiki/FreeSurfer)
+- The $SUBJECTS_DIR variable must be set to path to the directory where cneuromod subjects' freesurfer output is saved
+
+Script: src/features/run_FS.sh
+To run (where "01" is the subject number):
+```bash
+./src/features/run_FS.sh 01  
+```
+
+**Input**: Brain volumes of retinotopy metrics in T1w space \
+**Output**: freesurfer flat maps (one per hemisphere per metric). e.g., lh.s01_prf_ang.mgz & rh.s01_prf_ang.mgz
+
+
 --------
 
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
