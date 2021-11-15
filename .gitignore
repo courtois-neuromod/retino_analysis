@@ -86,6 +86,7 @@ target/
 .mypy_cache/
 
 # Output files
+test/*
 output/*
 stimuli/*
 results/*

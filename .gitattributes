@@ -6,7 +6,6 @@
 *.py annex.largefiles=nothing
 stimuli/*mat annex.largefiles=(largerthan=100kb)
 masks/*nii.gz=nothing
-data/* annex.largefiles=anything
 
 * annex.backend=MD5E
 **/.git* annex.largefiles=nothing
