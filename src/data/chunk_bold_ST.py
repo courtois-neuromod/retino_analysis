@@ -34,9 +34,10 @@ if __name__ == '__main__':
     '''
     args = get_arguments()
 
-    dir_path = '/home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis' if args.run_dir is None else args.run_dir
+    #dir_path = '/home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis' if args.run_dir is None else args.run_dir
+    dir_path = '/home/mariestl/cneuromod/retinotopy/retino_analysis' if args.run_dir is None else args.run_dir
 
-    sub_list = ['sub-01', 'sub-02', 'sub-03']
+    sub_list = ['sub-01']
     task_list = ['wedges', 'rings', 'bars']
 
     for sub in sub_list:
@@ -51,12 +52,12 @@ if __name__ == '__main__':
             chunk_size = args.chunk_size
             '''
             Number of voxels within "Whole Brain" mask outputed by average_bold.py, per participant
-            sub-01: 205455 voxels (w inclusive full brain mask)
-            sub-02: 221489 voxels (w inclusive full brain mask)
-            sub-03: 197945 voxels (w inclusive full brain mask)
+            sub-01: 205276 voxels (w inclusive full brain mask and slicetimed EPI mask)
+            sub-02: ?? voxels (w inclusive full brain mask)
+            sub-03: ?? voxels (w inclusive full brain mask)
             '''
 
-            file_path = os.path.join(dir_path, 'output', 'detrend', 'chunks_fullbrain_ST_', 's'+ sub[-2:], sub + '_epi_ST_FULLbrain_' + task + '_%04d.mat')
+            file_path = os.path.join(dir_path, 'output', 'detrend', 'chunks_fullbrain_ST', 's'+ sub[-2:], sub + '_epi_ST_FULLbrain_' + task + '_%04d.mat')
 
             for i in range(int(np.ceil(num_vox/chunk_size))):
 
