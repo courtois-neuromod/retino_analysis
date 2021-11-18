@@ -41,7 +41,7 @@ def make_sub_mask(dir_path, sub):
     #mask_path_list = sorted(glob.glob(os.path.join(dir_path, 'data', 'slicetime_bold', sub + '*_space-T1w_desc-brain_part-mag_mask.nii.gz')))
     # Elm
     stim_path = '/data/neuromod/DATA/cneuromod.processed/fmriprep/retinotopy'
-    mask_path_list = sorted(glob.glob(os.path.join(stim_path, sub, 'ses-00*/func', sub + '*_space-T1w_desc-brain_part-mag_mask.nii.gz'
+    mask_path_list = sorted(glob.glob(os.path.join(stim_path, sub, 'ses-00*/func', sub + '*_space-T1w_desc-brain_part-mag_mask.nii.gz')))
 
     for mask_path in mask_path_list:
         mask = nib.load(mask_path)
