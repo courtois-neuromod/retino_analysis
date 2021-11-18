@@ -96,8 +96,8 @@ def flatten_epi(dir_path, sub, task_list, per_session=False):
             flat_bold = apply_mask(imgs=epi, mask_img=sub_mask) # shape: (time, vox)
 
             # extract epi's confounds
-            conf_dir = os.path.join(dir_path, 'data', 'anat') #confound files saved and renamed
-            confounds = Minimal(global_signal='basic').load(os.path.join(conf_dir, os.path.basename(scan)[:-20] + 'bold.nii.gz'))
+            conf_dir = os.path.join(dir_path, 'data', 'slicetime_bold') #confound files saved and renamed
+            confounds = Minimal(global_signal='basic').load(os.path.join(conf_dir, os.path.basename(scan))[:-20] + 'bold.nii.gz')
             #confounds = Minimal(global_signal='basic').load(scan[:-20] + 'bold.nii.gz')
 
             # Detrend and normalize flattened data
