@@ -11,7 +11,7 @@ import argparse
 
 def get_arguments():
 
-    parser = argparse.ArgumentParser(description='Average bold response across retino sessions')
+    parser = argparse.ArgumentParser(description='Reassamble retinotopy outputs from chunks into brain volumes')
     parser.add_argument('--sub_num', required=True, type=str, help='subject number e.g., sub-01')
     parser.add_argument('--chunk_size', default=240, type=int, help='number of voxels per chunk')
     parser.add_argument('--dir_path', default=None, type=str, help='path to run dir (absolute)')

@@ -14,7 +14,7 @@ import argparse
 
 def get_arguments():
 
-    parser = argparse.ArgumentParser(description='Average bold response across retino sessions')
+    parser = argparse.ArgumentParser(description='Chunk detrended bold signal into 1D arrays')
     parser.add_argument('--run_dir', default=None, type=str, help='path to run dir (absolute)')
     parser.add_argument('--chunk_size', default=240, type=int, help='number of voxels per chunk')
     args = parser.parse_args()
