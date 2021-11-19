@@ -30,12 +30,12 @@ Script: src/data/average_bold.py
 
 To average bold data across sessions, per task, for each participant (one file per task =  3 bold files)
 ```bash
-python -m src.data.average_bold.py –-makemasks –-makestim
+python -m src.data.average_bold --makemasks --makestim
 ```
 
 To save bold data separately for each session (one file per task per session = 3 x 6 bold files)
 ```bash
-python -m src.data.average_bold.py –-makemasks –-makestim --per_session
+python -m src.data.average_bold --makemasks --makestim --per_session
 ```
 
 **Input**: bold nii.gz files processed with fmriprep in T1w space, and stimuli (aperture frames per TR) \
@@ -55,7 +55,7 @@ Script: src/data/chunk_bold.py
 
 Ideally, set chunk_size argument (which sets the number of voxels per chunk) to be a multiple of the number of matlab workers available on elm/ginkgo
 ```bash
-python -m src.data.chunk_bold –chunk_size=240
+python -m src.data.chunk_bold --chunk_size=240
 ```
 Note to self: Make sure to generate separate individual subject directories in which to save the 800+ chunks (s01, s02...)
 
@@ -168,7 +168,7 @@ Notes:
 Script: src/features/resample_npythy_ROIs.py
 Before running, load project's virtual env with **workon retino_analysis** (on beluga)
 ```bash
-python -m src.features.resample_npythy_ROIs –sub_num=”sub-01”
+python -m src.features.resample_npythy_ROIs --sub_num=”sub-01”
 ```
 
 **Input**: Inferred retinotopy flat maps \

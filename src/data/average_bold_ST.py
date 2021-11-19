@@ -37,7 +37,11 @@ def make_sub_mask(dir_path, sub):
     '''
     mask_list = []
 
-    mask_path_list = sorted(glob.glob(os.path.join(dir_path, 'data', 'slicetime_bold', sub + '*_space-T1w_desc-brain_part-mag_mask.nii.gz')))
+    # Beluga
+    #mask_path_list = sorted(glob.glob(os.path.join(dir_path, 'data', 'slicetime_bold', sub + '*_space-T1w_desc-brain_part-mag_mask.nii.gz')))
+    # Elm
+    stim_path = '/data/neuromod/DATA/cneuromod.processed/fmriprep/retinotopy'
+    mask_path_list = sorted(glob.glob(os.path.join(stim_path, sub, 'ses-00*/func', sub + '*_space-T1w_desc-brain_part-mag_mask.nii.gz')))
 
     for mask_path in mask_path_list:
         mask = nib.load(mask_path)
@@ -48,7 +52,8 @@ def make_sub_mask(dir_path, sub):
     nib.save(mean_epi_mask, os.path.join(dir_path, 'output', 'masks', sub + '_mean_epi_ST_mask.nii.gz'))
 
     # grey matter (anat) segmentation mask
-    anat_path = '/project/rrg-pbellec/datasets/cneuromod_processed/smriprep/' + sub + '/anat'
+    #anat_path = '/project/rrg-pbellec/datasets/cneuromod_processed/smriprep/' + sub + '/anat'
+    anat_path = '/home/mariestl/cneuromod/retinotopy/retino_analysis/data/anat'
     seg_mask = nib.load(os.path.join(anat_path, sub + '_label-GM_probseg.nii.gz'))
     seg_mask_rs = resample_to_img(seg_mask, mean_epi_mask, interpolation='nearest')
     seg_mask_rs_sm = smooth_img(imgs=seg_mask_rs, fwhm=3)
@@ -68,8 +73,12 @@ def flatten_epi(dir_path, sub, task_list, per_session=False):
     confounds_per_task = []
     sub_affine = None
 
+    stim_path = '/data/neuromod/DATA/cneuromod.processed/fmriprep/retinotopy'
     for task in task_list:
-        scan_list = sorted(glob.glob(os.path.join(dir_path, 'data', 'slicetime_bold', sub + '*' + task + '_space-T1w_desc-preproc_part-mag_bold.nii.gz')))
+        # beluga
+        #scan_list = sorted(glob.glob(os.path.join(dir_path, 'data', 'slicetime_bold', sub + '*' + task + '_space-T1w_desc-preproc_part-mag_bold.nii.gz')))
+        # elm
+        scan_list = sorted(glob.glob(os.path.join(stim_path, sub, 'ses-00*/func', sub + '*' + task + '_space-T1w_desc-preproc_part-mag_bold.nii.gz')))
         flatbold_list = []
 
         sess_num = 1
@@ -87,7 +96,9 @@ def flatten_epi(dir_path, sub, task_list, per_session=False):
             flat_bold = apply_mask(imgs=epi, mask_img=sub_mask) # shape: (time, vox)
 
             # extract epi's confounds
-            confounds = Minimal(global_signal='basic').load(scan[:-20] + 'bold.nii.gz')
+            conf_dir = os.path.join(dir_path, 'data', 'slicetime_bold') #confound files saved and renamed
+            confounds = Minimal(global_signal='basic').load(os.path.join(conf_dir, os.path.basename(scan))[:-20] + 'bold.nii.gz')
+            #confounds = Minimal(global_signal='basic').load(scan[:-20] + 'bold.nii.gz')
 
             # Detrend and normalize flattened data
             # note: signal.clean takes (time, vox) shaped input
@@ -141,9 +152,13 @@ if __name__ == '__main__':
     '''
     args = get_arguments()
 
-    dir_path = '/home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis' if args.dir_path is None else args.dir_path
+    # Beluga
+    #dir_path = '/home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis' if args.dir_path is None else args.dir_path
+    # Elm
+    dir_path = '/home/mariestl/cneuromod/retinotopy/retino_analysis' if args.dir_path is None else args.dir_path
 
-    sub_list = ['sub-01', 'sub-02', 'sub-03']
+    #sub_list = ['sub-01', 'sub-02', 'sub-03']
+    sub_list = ['sub-01']
     task_list = ['wedges', 'rings', 'bars']
 
     for sub in sub_list:
