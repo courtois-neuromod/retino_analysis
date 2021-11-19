@@ -70,7 +70,7 @@ if __name__ == '__main__':
     in_path = os.path.join(dir_path, 'results', 'npythy', sub, )
     out_path = os.path.join(dir_path, 'results', 'roi_masks')
 
-    roi_list = [('1', 'V1'), ('2', 'V2'), ('3', 'V3'), ('4', 'hV4'), ('5', 'VO1'), ('6', 'VO2'), ('7', 'LO1'), ('8', 'LO2'), ('9', 'TO1'), ('10', 'TO2'), ('11', 'V3b'), ('12', 'V3a')]
+    roi_list = [('1', 'V1'), ('2', 'V2'), ('3', 'V3'), ('4', 'hV4'), ('5', 'VO1'), ('6', 'VO2'), ('7', 'LO1'), ('8', 'LO2'), ('9', 'TO1'), ('10', 'TO2'), ('11', 'V3B'), ('12', 'V3A')]
     roi_masks = {}
 
     for roi in roi_list:
