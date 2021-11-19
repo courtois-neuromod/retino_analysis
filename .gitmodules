@@ -11,8 +11,3 @@
 	url = /lustre03/project/6003287/datasets/cneuromod_processed/smriprep/sourcedata/freesurfer
 	datalad-id = e91589e2-3533-4b78-9bd2-660e2cc26a59
 	datalad-url = /lustre03/project/6003287/datasets/cneuromod_processed/smriprep/sourcedata/freesurfer
-[submodule "data/cneuromod_processed"]
-	path = data/cneuromod_processed
-	url = /lustre03/project/6003287/datasets/cneuromod_processed
-	datalad-id = 0ad66968-e037-49b9-a9a4-c57f33479870
-	datalad-url = /lustre03/project/6003287/datasets/cneuromod_processed

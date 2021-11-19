@@ -92,3 +92,4 @@ stimuli/*
 results/*
 data/temp_bold_test/*
 data/temp_bold/*
+data/slicetime_bold/*
