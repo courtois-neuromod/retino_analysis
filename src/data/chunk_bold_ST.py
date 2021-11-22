@@ -51,7 +51,7 @@ if __name__ == '__main__':
             # default for parpool processing set in interface (local profile), bottom left icon
             chunk_size = args.chunk_size
             '''
-            Number of voxels within "Whole Brain" mask outputed by average_bold.py, per participant
+            Number of voxels within "Whole Brain" mask outputed by average_bold_ST.py, per participant
             sub-01: 205276 voxels (w inclusive full brain mask and slicetimed EPI mask)
             sub-02: ?? voxels (w inclusive full brain mask)
             sub-03: ?? voxels (w inclusive full brain mask)
