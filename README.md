@@ -19,7 +19,7 @@ python -m src.data.make_stimuli
 ```
 
 **Input**: psychopy binary aperture masks (stimuli [1 = pixel where images are shown at time t, 0 = no image shown]) \
-**Output**: Binary aperture masks are averaged within each TR to obtain a temporal sequence of aperture frames (floats [0, 1]) for each TR. 
+**Output**: Binary aperture masks are averaged within each TR to obtain a temporal sequence of aperture frames (floats [0, 1]) for each TR.
 
 ------------
 **Step 2. Pre-process bold data and stimuli for the analyzepRF toolbox**
@@ -39,8 +39,8 @@ python -m src.data.average_bold --makemasks --makestim --per_session
 ```
 
 **Input**: bold nii.gz files processed with fmriprep in T1w space, and stimuli (aperture frames per TR) \
-**Output**: 
-- Stimuli resized to 192x192 to speed up analyzePRF processing time (first three TRs dropped) 
+**Output**:
+- Stimuli resized to 192x192 to speed up analyzePRF processing time (first three TRs dropped)
 - Whole-brain subject masks made from subject's epi masks (one per session for each task) and from a grey matter anatomical mask outputted by freesurfer
 - Detrended and normalized bold runs averaged per task across 5/6 sessions; saved as a 1D flattened masked array inside a .mat file
 
@@ -49,7 +49,7 @@ python -m src.data.average_bold --makemasks --makestim --per_session
 
 Note: processes data from multiple participants.
 
-AnalyzePRF processes each voxel individually, which is maddeningly slow. Chunks allow to run the pipeline in parallel from different machines (e.g., elm and ginkgo) to speed up the process. 
+AnalyzePRF processes each voxel individually, which is maddeningly slow. Chunks allow to run the pipeline in parallel from different machines (e.g., elm and ginkgo) to speed up the process.
 
 Script: src/data/chunk_bold.py
 
@@ -70,7 +70,7 @@ Note: processes a single participant at a time, very slowly.
 
 Transfer data (chunks and resized stimuli) from Compute Canada to elm/ginkgo, and process it through Kendrick Kay’s AnalyzePRF retinotopy toolbox (in matlab). Toolbox repo [here](https://github.com/cvnlab/analyzePRF); Toolbox documentation/examples [here](http://kendrickkay.net/analyzePRF/).
 
-Notes: 
+Notes:
 - Matlab version: R2021a Update 5 (9.10.0.1739362) 64-bit (glnxa64) is installed on elm/ginkgo with UdeM license
 - On elm/ginkgo, I have a downloaded a copy of the analyze_pFR toolbox code locally from the repo (it's not a repo though) in /home/mariestl/cneuromod/retinotopy/analyzePRF
 
@@ -84,7 +84,7 @@ Generic copy of the script that calls analyzePRF: src/features/run_analyzePRF.m 
 Example bash script to call run_analyzePRF.m from the console: src/features/call_analyze_script.sh
 
 - Run the script inside a detachable tmux session (it will take > 24h for an entire brain with 50 workers)
-E.g., 
+E.g.,
 ```bash
 tmux
 module load matlab
@@ -99,7 +99,7 @@ Note to self: The number of workers used by parpool for parallel processing is d
 ------------
 **Step 5. Reconstruct chunked output files into brain volumes and pre-process metrics for Neuropythy toolbox**
 
-Copy the chunked results files from elm/ginkgo:/ /home/mariestl/cneuromod/retinotopy/analyzePRF/results/sub-0*/fullbrain 
+Copy the chunked results files from elm/ginkgo:/ /home/mariestl/cneuromod/retinotopy/analyzePRF/results/sub-0*/fullbrain
 into beluga:/home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis/results/analyzePRF/chunked/s0*
 
 Then, reassemble the chunked output files into brain volumes and adapt them for Neuropythy. \
@@ -108,7 +108,7 @@ Note: processes a single participant's data at a time.
 
 Script: src/features/reassamble_voxels.py
 ```bash
-python m src/features/reassamble_voxels.py --sub_num=”sub-03” 
+python -m src.features.reassamble_voxels.py --sub_num=”sub-03”
 ```
 
 **Input**: Chunks of retinotopy metrics saved as 1D arrays in .mat file \
@@ -118,7 +118,7 @@ python m src/features/reassamble_voxels.py --sub_num=”sub-03”
 ------------
 **Step 6. Convert retinotopy output maps from T1w volumes into flat maps with freesurfer**
 
-Notes: 
+Notes:
 - this step requires access to fmriprep freesurfer output
 - I installed freesurfer locally in my home directory, following Compute Canada [guidelines](https://docs.computecanada.ca/wiki/FreeSurfer)
 - The $SUBJECTS_DIR variable must be set to the path to the directory where cneuromod subjects' freesurfer output is saved
@@ -136,10 +136,10 @@ To run (where "01" is the subject number):
 ------------
 **Step 7. Process flat maps with neuropythy toolbox**
 
-The Neuropythy toolbox estimates regions of interest based on a single subject's retinotopy results, plus a prior of ROIs estimated from the HCP project. 
+The Neuropythy toolbox estimates regions of interest based on a single subject's retinotopy results, plus a prior of ROIs estimated from the HCP project.
 Neuropythy [repo](https://github.com/noahbenson/neuropythy) and [command line arguments](https://github.com/noahbenson/neuropythy/blob/master/neuropythy/commands/register_retinotopy.py); Neuropythy [user manual](https://osf.io/knb5g/wiki/Usage/).
 
-Notes: 
+Notes:
 - this step requires to load java and freesurfer modules; $SUBJECTS_DIR needs to be specified just like in step 6.
 - There is a Visible Deprecation Warning that appears with newer versions of numpy that do not affect the output. [Filed repo issue here.](https://github.com/noahbenson/neuropythy/issues/24)
 
@@ -158,9 +158,9 @@ To run (where "01" is the subject number):
 **First**: re-orient the neuropythy output with mri_convert and fsl
 Script: src/features/reorient_npythy.sh
 ```bash
-./src/features/reorient_npythy.sh 01 
+./src/features/reorient_npythy.sh 01
 ```
-Notes: 
+Notes:
 - this script needs to run from within the subject’s freesurfer "MRI" directory (hence the "cd") so it knows where to find freesurfer files.
 - on Compute Canada, the script prompts to specify which module versions to use; chose option 2 : fsl/6.0.3 StdEnv/2020 gcc/9.3.0
 
