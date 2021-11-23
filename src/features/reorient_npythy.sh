@@ -5,7 +5,8 @@ module load fsl/6.0.3
 
 module load freesurfer/7.1.1
 
-workon retino_analysis
+#workon retino_analysis
+source /project/rrg-pbellec/mstlaure/.virtualenvs/retino_analysis/bin/activate
 
 # Goal: to reorient the neuropythy output
 # https://github.com/noahbenson/neuropythy/blob/master/neuropythy/commands/register_retinotopy.py

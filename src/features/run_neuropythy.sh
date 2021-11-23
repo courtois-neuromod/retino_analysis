@@ -3,7 +3,8 @@ module load java/11.0.2
 module load freesurfer/7.1.1
 
 # activate project's virtual env
-workon retino_analysis
+#workon retino_analysis
+source /project/rrg-pbellec/mstlaure/.virtualenvs/retino_analysis/bin/activate
 
 # set Freesurfer SUBJECT_DIR path
 #CN_SUBJECTS="/home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis/data/temp_fs"
