@@ -2,7 +2,8 @@
 module load freesurfer/7.1.1
 
 # ex to run script: ./run_FS.sh 01 rfsize
-workon retino_analysis
+#workon retino_analysis
+source /project/rrg-pbellec/mstlaure/.virtualenvs/retino_analysis/bin/activate
 
 # set $SUBJECTS_DIR to cneuromod freesurfer data directory
 # On Compute Canada:
