@@ -188,7 +188,7 @@ if __name__ == '__main__':
     y_vol = unmask(apply_mask(unmask(y, full_mask), clean_mask), clean_mask)
 
     nib.save(ecc_vol, f'{dir_path}/results/analyzePRF/{sub}_fullbrain_ecc_goodvox.nii.gz')
-    nib.save(ecc_mask, f'{dir_path}/results/analyzePRF/{sub}_fullbrain_eccMask10_goodvox.nii.gz')
+    nib.save(ecc_mask_vol, f'{dir_path}/results/analyzePRF/{sub}_fullbrain_eccMask10_goodvox.nii.gz')
     nib.save(ecc_cap10deg_vol, f'{dir_path}/results/analyzePRF/{sub}_fullbrain_eccCAP10DEG_goodvox.nii.gz')
     nib.save(ang_vol_compass, f'{dir_path}/results/analyzePRF/{sub}_fullbrain_angCompass_goodvox.nii.gz')
     nib.save(x_vol, f'{dir_path}/results/analyzePRF/{sub}_fullbrain_x_goodvox.nii.gz')
