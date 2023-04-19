@@ -220,5 +220,5 @@ if __name__ == '__main__':
     file_list = glob.glob(f'{npy_dir_path}/resampled*.nii.gz')
 
     for file in file_list:
-        rs_vol = unmask(apply_mask(nib.load(file), clean_mask)), clean_mask)
-        nib.save(rs_vol, f'{file[:-7]}_goodvox.nii.gz') 
+        rs_vol = unmask(apply_mask(nib.load(file), clean_mask), clean_mask)
+        nib.save(rs_vol, f'{file[:-7]}_goodvox.nii.gz')
