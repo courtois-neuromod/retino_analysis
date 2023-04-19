@@ -19,59 +19,6 @@ def get_arguments():
     return args
 
 
-
-def get_angles_and_ecc(dir_path, sub, conv_factor, mask, r2, threshold):
-    '''
-    AnalyzePRF: angle and eccentricity values are in pixel units with a lower bound of 0 pixels.
-    Neuropythy: values must be in degrees of visual angle from the fovea.
-    '''
-    ecc = loadmat(os.path.join(dir_path, 'results/analyzePRF', 'sub' + sub[-2:] + '_fullbrain_ecc.mat'))['sub' + sub[-2:] + '_ecc'].reshape(-1,)
-    ang = loadmat(os.path.join(dir_path, 'results/analyzePRF', 'sub' + sub[-2:] + '_fullbrain_ang.mat'))['sub' + sub[-2:] + '_ang'].reshape(-1,)
-    # calculate x and y coordinates (in pixels)
-    x = np.cos(np.radians(ang))*ecc
-    y = np.sin(np.radians(ang))*ecc
-
-    # convert from pixels to degrees of visual angle
-    ecc *= conv_factor
-    x *= conv_factor
-    y *= conv_factor
-
-    '''
-    AnalyzePRF: angle values range between 0 and 360 degrees.
-    0 corresponds to the right horizontal meridian, 90 corresponds to the upper vertical meridian, and so on.
-    In the case where <ecc> is estimated to be exactly equal to 0,
-    the corresponding <ang> value is deliberately set to NaN.
-
-    Neuropythy: Angle values vary from 0-180.
-    Values must be absolute (the doc is not up to date in the Usage manual; repo's readme must up to date)
-    0 represents the upper vertical meridian and 180 represents the lower vertical meridian in both hemifields.
-    Positive values refer to the right visual hemi-field for the left hemisphere, and vice versa.
-
-    https://github.com/noahbenson/neuropythy/issues?q=is%3Aissue+is%3Aclosed
-    '''
-    # converts angles from "compass" to "signed north-south" for neuropythy
-    ang[np.logical_not(ang > 270)] = 90 - ang[np.logical_not(ang > 270)]
-    ang[ang > 270] = 450 - ang[ang > 270]
-    ang = np.absolute(ang)
-
-    # only for visualization
-    if threshold:
-        ecc = ecc*(r2 > 0.1)
-        ang = ang*(r2 > 0.1)
-        x = x*(r2 > 0.1)
-        y = y*(r2 > 0.1)
-
-    unflat_ecc = unmask(ecc, mask)
-    unflat_ang = unmask(ang, mask)
-    unflat_x = unmask(x, mask)
-    unflat_y = unmask(y, mask)
-
-    nib.save(unflat_ecc, os.path.join(dir_path, 'results/analyzePRF', sub + '_fullbrain_ecc.nii.gz'))
-    nib.save(unflat_ang, os.path.join(dir_path, 'results/analyzePRF', sub + '_fullbrain_ang.nii.gz'))
-    nib.save(unflat_x, os.path.join(dir_path, 'results/analyzePRF', sub + '_fullbrain_x.nii.gz'))
-    nib.save(unflat_y, os.path.join(dir_path, 'results/analyzePRF', sub + '_fullbrain_y.nii.gz'))
-
-
 if __name__ == '__main__':
     '''
     Script masks out bad voxels (some runs have no variability in the signal) from volumes,
@@ -176,7 +123,7 @@ if __name__ == '__main__':
     # create map of capped eccentricity values (only include tested values)
     ecc_cap10deg = ecc.copy()
     ecc_mask = (ecc_cap10deg < 10.0).astype(int)
-    ecc_cap10deg[ecc_cap10deg < 10.0] = np.nan
+    ecc_cap10deg[ecc_cap10deg > 10.0] = np.nan
 
 
     # generate clean volumes (remove voxels without signal variability)
