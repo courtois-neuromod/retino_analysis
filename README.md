@@ -45,7 +45,7 @@ python -m src.data.average_bold --makemasks --makestim --per_session
 - Detrended and normalized bold runs averaged per task across 5/6 sessions; saved as a 1D flattened masked array inside a .mat file
 
 ------------
-**Step 3. Chunk flattened and detrended brain voxels into segments that load easily into matlabx**
+**Step 3. Chunk flattened and detrended brain voxels into segments that load easily into matlab**
 
 Note: processes data from multiple participants.
 
@@ -114,9 +114,8 @@ python -m src.features.reassamble_voxels.py --sub_num=”sub-03”
 **Input**: Chunks of retinotopy metrics saved as 1D arrays in .mat file \
 **Output**: Brain volumes of retinotopy metrics in T1w space
 
-
 ------------
-**Step 6. Convert retinotopy output maps from T1w volumes into flat maps with freesurfer**
+**Step 6. Convert retinotopy output maps from T1w volumes into surfaces with freesurfer**
 
 Notes:
 - this step requires access to fmriprep freesurfer output
@@ -130,11 +129,11 @@ To run (where "01" is the subject number):
 ```
 
 **Input**: Brain volumes of retinotopy metrics in T1w space \
-**Output**: freesurfer flat maps (one per hemisphere per metric). e.g., lh.s01_prf_ang.mgz & rh.s01_prf_ang.mgz
+**Output**: freesurfer surface maps (one per hemisphere per metric). e.g., lh.s01_prf_ang.mgz & rh.s01_prf_ang.mgz
 
 
 ------------
-**Step 7. Process flat maps with neuropythy toolbox**
+**Step 7. Process surface maps with neuropythy toolbox**
 
 The Neuropythy toolbox estimates regions of interest based on a single subject's retinotopy results, plus a prior of ROIs estimated from the HCP project.
 Neuropythy [repo](https://github.com/noahbenson/neuropythy) and [command line arguments](https://github.com/noahbenson/neuropythy/blob/master/neuropythy/commands/register_retinotopy.py); Neuropythy [user manual](https://osf.io/knb5g/wiki/Usage/).
@@ -149,8 +148,8 @@ To run (where "01" is the subject number):
 ./src/features/run_neuropythy.sh 01
 ```
 
-**Input**: freesurfer flat maps of retinotopy metrics \
-**Output**: Inferred retinotopy flat maps (based on atlas prior and subject's own retinotopy data) and region of interest labels (e.g., lh.inferred_varea.mgz)
+**Input**: freesurfer surface maps of retinotopy metrics \
+**Output**: Inferred retinotopy surface maps (based on atlas prior and subject's own retinotopy data) and region of interest labels (e.g., lh.inferred_varea.mgz)
 
 ------------
 **Step 8. Reorient and resample neuropythy output maps and project the results back into T1w volume space**
@@ -171,8 +170,61 @@ Before running, load project's virtual env with **workon retino_analysis** (on b
 python -m src.features.resample_npythy_ROIs --sub_num=”sub-01”
 ```
 
-**Input**: Inferred retinotopy flat maps \
-**Output**: NIfTI volumes of retinotopy results adjuted from atlas prior, and inferred regions of interest (binary mask for V1, V2, V3, hV4, V01, V02, L01, L02, T01, T02, V3b and V3a) in T1w space
+**Input**: Inferred retinotopy surface maps \
+**Output**: NIfTI volumes of retinotopy results adjusted from atlas prior, and inferred regions of interest (binary mask for V1, V2, V3, hV4, V01, V02, L01, L02, T01, T02, V3b and V3a) in T1w space
+
+--------
+
+**Step 8. Clean up operation**
+
+When z-scoring (per run) the BOLD data given to the AnalyzePRF toolbox, some voxels within
+the WholeBrain functional mask (used to mask data across all runs) have nan scores (due to low/no signal on some runs).
+
+Step 1: identify voxels to exclude from final volumes
+
+This script identifies voxels with nan scores, and creates masks to exclude them from final result volumes.
+
+Server: beluga \
+Path to data: /home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis/data/temp_bold \
+Path to code dir: /home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis \
+Script: quick_mask_QC_retino.py
+
+Call script in interactive session on beluga (small dumb script, input and output paths hard-coded)
+```bash
+workon retino_analysis
+python -m quick_mask_QC_retino
+```
+
+**Input**:
+- All subject's *bold.nii.gz files, for all sessions (~6) and runs (3 per session) \
+(e.g., sub-03_ses-10_task-things_run-1_space-T1w_desc-preproc_part-mag_bold.nii.gz)
+- The functional mask used to mask all run data (e.g., sub-02_WholeBrain.nii.gz)
+
+**Output**:
+- One mask that includes all voxels with at least one normalized BOLD value equal to nan within the broader functional brain mask (e.g., 01_nanmask_T1w_retino.nii)
+- One mask that includes all voxels with no normalized BOLD value equal to nan within the broader functional brain mask (e.g., 01_goodvoxmask_T1w_retino.nii)
+
+
+Step 2: This script uses the good voxel mask created in step one to clean up output volumes of AnalyzePRF and Neuropythy analyses
+
+Server: beluga \
+Path to data: /home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis/results \
+Path to code dir: /home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis \
+Script: clean_volumes.py
+
+Call script in interactive session on beluga (small dumb script, input and output paths hard-coded)
+```bash
+workon retino_analysis
+python -m clean_volumes --sub_num=”sub-01”
+```
+
+**Input**:
+- The functional mask used to mask all run data (e.g., sub-02_WholeBrain.nii.gz) and the clean mask created in step 1 (e.g., 01_goodvoxmask_T1w_retino.nii)
+- The .mat files of AnalyzePRF results per masked voxels outputed at step 5
+- The resampled volumes of Neuropythy data (sub-01/resampled*.nii.gz) outputed at step 7
+
+**Output**:
+- Clean volumes of Neuropythy and AnalyzePRF results in functional T1w space
 
 --------
 
