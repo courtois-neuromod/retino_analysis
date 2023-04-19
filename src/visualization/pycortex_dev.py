@@ -227,7 +227,7 @@ kanwisher_group_path = '/home/labopb/Documents/Marie/neuromod/THINGS/floc_events
 
 # parcels per retino ROI: V1, V2, V3
 pname = 'V2'
-fp = f'{retino_parcel_path}/sub-{s}_resampled_{pname}_interp-nn.nii.gz'
+fp = f'{retino_parcel_path}/sub-{s}_resampled_{pname}_interp-nn_goodvox.nii.gz'
 fp_arr = np.swapaxes(nib.load(fp).get_fdata(), 0, -1)
 fp_arr[fp_arr <= 0] = np.nan
 my_vol = cortex.Volume(fp_arr, f'S{s}', 'align_auto', vmin=np.nanmin(fp_arr), vmax=np.nanmax(fp_arr), cmap='Retinotopy_RYBCR')
@@ -317,37 +317,63 @@ cortex.webshow(my_vol, recache=True)
 
 
 # post neuropythy retinotopy data
-pa_f_rs = f'{retino_path}/npythy/resampled_angle.nii.gz'
+pa_f_rs = f'{retino_path}/npythy/resampled_angle_goodvox.nii.gz'
 pa_arr_rs = np.swapaxes(nib.load(pa_f_rs).get_fdata(), 0, -1)
 pa_arr_rs[pa_arr_rs == 0] = np.nan
 my_vol = cortex.Volume(pa_arr_rs, f'S{s}', 'align_auto', vmin=np.nanmin(pa_arr_rs), vmax=np.nanmax(pa_arr_rs), cmap='Retinotopy_RYBCR')
 
-va_f_rs = f'{retino_path}/npythy/resampled_varea.nii.gz'
+va_f_rs = f'{retino_path}/npythy/resampled_varea_goodvox.nii.gz'
 va_arr_rs = np.swapaxes(nib.load(va_f_rs).get_fdata(), 0, -1)
 va_arr_rs[va_arr_rs == 0] = np.nan
 my_vol = cortex.Volume(va_arr_rs, f'S{s}', 'align_auto', vmin=np.nanmin(va_arr_rs), vmax=np.nanmax(va_arr_rs), cmap='nipy_spectral')
 
-ex_f_rs = f'{retino_path}/npythy/resampled_eccen.nii.gz'
+ex_f_rs = f'{retino_path}/npythy/resampled_eccen_goodvox.nii.gz'
 ex_arr_rs = np.swapaxes(nib.load(ex_f_rs).get_fdata(), 0, -1)
 ex_arr_rs[ex_arr_rs == 0] = np.nan
 my_vol = cortex.Volume(ex_arr_rs, f'S{s}', 'align_auto', vmin=np.nanmin(ex_arr_rs), vmax=np.nanmax(ex_arr_rs), cmap='Retinotopy_RYBCR')
 
 
 # pre neuropythy (raw) retinotopy data
-pa = f'{retino_path}/analyzePRF/sub-{s}_fullbrain_ang.nii.gz'
+pa = f'{retino_path}/analyzePRF/sub-{s}_fullbrain_ang_goodvox.nii.gz'
 pa_arr = np.swapaxes(nib.load(pa).get_fdata(), 0, -1)
 pa_arr[pa_arr == 0] = np.nan
 my_vol = cortex.Volume(pa_arr, f'S{s}', 'align_auto', vmin=np.nanmin(pa_arr), vmax=np.nanmax(pa_arr), cmap='Retinotopy_RYBCR')
 
-eccen = f'{retino_path}/analyzePRF/sub-{s}_fullbrain_ecc.nii.gz'
+pa = f'{retino_path}/analyzePRF/sub-{s}_fullbrain_angCompass_goodvox.nii.gz'
+pa_arr = np.swapaxes(nib.load(pa).get_fdata(), 0, -1)
+pa_arr[pa_arr == 0] = np.nan
+my_vol = cortex.Volume(pa_arr, f'S{s}', 'align_auto', vmin=np.nanmin(pa_arr), vmax=np.nanmax(pa_arr), cmap='Retinotopy_RYBCR')
+
+eccen = f'{retino_path}/analyzePRF/sub-{s}_fullbrain_ecc_goodvox.nii.gz'
 ex_arr = np.swapaxes(nib.load(eccen).get_fdata(), 0, -1)
 ex_arr[ex_arr == 0] = np.nan
 my_vol = cortex.Volume(ex_arr, f'S{s}', 'align_auto', vmin=np.nanmin(ex_arr), vmax=np.nanmax(ex_arr), cmap='Retinotopy_RYBCR')
 
-rfsize = f'{retino_path}/analyzePRF/sub-{s}_fullbrain_rfsize.nii.gz'
+# eccentricity, capped at 10 deg vis angle (area tested)
+eccen = f'{retino_path}/analyzePRF/sub-{s}_fullbrain_eccCAP10DEG_goodvox.nii.gz'
+ex_arr = np.swapaxes(nib.load(eccen).get_fdata(), 0, -1)
+ex_arr[ex_arr == 0] = np.nan
+my_vol = cortex.Volume(ex_arr, f'S{s}', 'align_auto', vmin=np.nanmin(ex_arr), vmax=np.nanmax(ex_arr), cmap='Retinotopy_RYBCR')
+
+rfsize = f'{retino_path}/analyzePRF/sub-{s}_fullbrain_rfsize_goodvox.nii.gz'
 rfs_arr = np.swapaxes(nib.load(rfsize).get_fdata(), 0, -1)
 rfs_arr[rfs_arr == 0] = np.nan
 my_vol = cortex.Volume(rfs_arr, f'S{s}', 'align_auto', vmin=np.nanmin(rfs_arr), vmax=np.nanmax(rfs_arr), cmap='nipy_spectral')
+
+r2 = f'{retino_path}/analyzePRF/sub-{s}_fullbrain_R2_goodvox.nii.gz'
+r2_arr = np.swapaxes(nib.load(r2).get_fdata(), 0, -1)
+r2_arr[r2_arr == 0] = np.nan
+my_vol = cortex.Volume(r2_arr, f'S{s}', 'align_auto', vmin=np.nanmin(r2_arr), vmax=np.nanmax(r2_arr), cmap='nipy_spectral')
+
+x = f'{retino_path}/analyzePRF/sub-{s}_fullbrain_x_goodvox.nii.gz'
+x_arr = np.swapaxes(nib.load(x).get_fdata(), 0, -1)
+x_arr[x_arr == 0] = np.nan
+my_vol = cortex.Volume(x_arr, f'S{s}', 'align_auto', vmin=np.nanmin(x_arr), vmax=np.nanmax(x_arr), cmap='nipy_spectral')
+
+y = f'{retino_path}/analyzePRF/sub-{s}_fullbrain_y_goodvox.nii.gz'
+y_arr = np.swapaxes(nib.load(y).get_fdata(), 0, -1)
+y_arr[y_arr == 0] = np.nan
+my_vol = cortex.Volume(y_arr, f'S{s}', 'align_auto', vmin=np.nanmin(y_arr), vmax=np.nanmax(y_arr), cmap='nipy_spectral')
 
 
 # Kanwisher + floc contrast ROIs

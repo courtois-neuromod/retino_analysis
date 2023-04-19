@@ -175,16 +175,20 @@ if __name__ == '__main__':
 
     # create map of capped eccentricity values (only include tested values)
     ecc_cap10deg = ecc.copy()
-    ecc_cap10deg[ecc_cap10deg > 10.0] = np.nan
+    ecc_mask = (ecc_cap10deg < 10.0).astype(int)
+    ecc_cap10deg[ecc_cap10deg < 10.0] = np.nan
+
 
     # generate clean volumes (remove voxels without signal variability)
     ecc_vol = unmask(apply_mask(unmask(ecc, full_mask), clean_mask), clean_mask)
+    ecc_mask_vol = unmask(apply_mask(unmask(ecc_mask, full_mask), clean_mask), clean_mask)
     ecc_cap10deg_vol = unmask(apply_mask(unmask(ecc_cap10deg, full_mask), clean_mask), clean_mask)
     ang_vol_compass = unmask(apply_mask(unmask(ang, full_mask), clean_mask), clean_mask)
     x_vol = unmask(apply_mask(unmask(x, full_mask), clean_mask), clean_mask)
     y_vol = unmask(apply_mask(unmask(y, full_mask), clean_mask), clean_mask)
 
     nib.save(ecc_vol, f'{dir_path}/results/analyzePRF/{sub}_fullbrain_ecc_goodvox.nii.gz')
+    nib.save(ecc_mask, f'{dir_path}/results/analyzePRF/{sub}_fullbrain_eccMask10_goodvox.nii.gz')
     nib.save(ecc_cap10deg_vol, f'{dir_path}/results/analyzePRF/{sub}_fullbrain_eccCAP10DEG_goodvox.nii.gz')
     nib.save(ang_vol_compass, f'{dir_path}/results/analyzePRF/{sub}_fullbrain_angCompass_goodvox.nii.gz')
     nib.save(x_vol, f'{dir_path}/results/analyzePRF/{sub}_fullbrain_x_goodvox.nii.gz')
