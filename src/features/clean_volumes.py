@@ -99,7 +99,7 @@ if __name__ == '__main__':
 
     Neuropythy : variance explained must be a fraction between v such that 0 ≤ v ≤ 1
     '''
-    r2 = loadmat(f'{dir_path}/results/analyzePRF/sub-{sub[-2:]}_fullbrain_R2.mat')[f'sub{sub[-2:]}_R2'].reshape(-1,)
+    r2 = loadmat(f'{dir_path}/results/analyzePRF/sub{sub[-2:]}_fullbrain_R2.mat')[f'sub{sub[-2:]}_R2'].reshape(-1,)
     # replace nan by 0: no variance exmplained
     r2 = np.nan_to_num(r2)/100 # convert percentage
     # Cap values between 0 and 1
