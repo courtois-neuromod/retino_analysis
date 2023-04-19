@@ -215,7 +215,7 @@ Script: clean_volumes.py
 Call script in interactive session on beluga (small dumb script, input and output paths hard-coded)
 ```bash
 workon retino_analysis
-python -m clean_volumes --sub_num=”sub-01”
+python -m clean_volumes --sub_num=sub-01
 ```
 
 **Input**:
@@ -224,7 +224,7 @@ python -m clean_volumes --sub_num=”sub-01”
 - The resampled volumes of Neuropythy data (sub-01/resampled*.nii.gz) outputed at step 7
 
 **Output**:
-- Clean volumes of Neuropythy and AnalyzePRF results in functional T1w space
+- Clean volumes of Neuropythy and AnalyzePRF results in functional T1w space. All files are relabelled *goodvox.nii.gz
 
 --------
 
