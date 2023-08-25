@@ -9,7 +9,7 @@ They are saved under anat.freesurfer/sub-0*/surf/
 Flat maps for dummies: https://docs.google.com/document/d/19EgtxN0BezHSO1hqkfmzzcpVCPRjrOcBDvrkXp0owxk/edit
 
 ------------
-**Step 1. Install Pycortex**
+**Step 1. Install Pycortex**\
 https://github.com/gallantlab/pycortex
 
 
@@ -43,8 +43,8 @@ import cortex
 cortex.options.usercfg
 ```
 
-Edit the config file manually to specify the wanted location for the pycortex filestore (database). \
-Replacing the file store's relative path (default) with its absolute path can help.
+Edit the config file manually to specify the wanted location for the pycortex filestore (database).\
+Replacing the file store's relative path (default) with its absolute path can help.\
 E.g., Replace
 ```bash
 filestore = build/bdist.linux-x86_64/wheel/pycortex-1.2.2.data/data/share/pycortex/db
@@ -54,7 +54,8 @@ With:
 filestore = /abs/path/to/venv/pycortex_venv/share/pycortex/db
 ```
 
-In the config file, also replace the relative path of the color map with its absolute path:
+In the config file, also replace the relative path of the color map with its absolute path.\
+E.g., Replace:
 ```bash
 colormaps = build/bdist.linux-x86_64/wheel/pycortex-1.2.2.data/data/share/pycortex/colormaps
 ```
@@ -73,9 +74,9 @@ A web browser window should pop up with a demo subject.
 
 
 ------------
-**Step 1. Import Freesurfer subject data into Pycortex**
+**Step 2. Import Freesurfer subject data into Pycortex**
 
-You need to have Freesurfer installed for this step to work, as pycortex depends on it
+You need to have Freesurfer installed as a dependency.\
 https://surfer.nmr.mgh.harvard.edu/
 
 This step imports Freesurfer subject data (surfaces and volumes) into the pycortex filestore (database) specified in your pycortex config file (e.g., /abs/path/to/venv/pycortex_venv/share/pycortex/db)
@@ -102,11 +103,11 @@ for s in slist:
 ```
 
 ------------
-**Step 2. Generate mean epi images from functional runs**
+**Step 3. Generate mean epi images from functional runs**
 
 For each CNeuromod subject, generate a single mean epi image from a single run of bold data preprocessed with fmriprep. It can be any run, from any task (friends, mario, localizer, things, resting state). This bold file will be used to generate a transformation from functional space to Freesurfer/Pycortex surface space, so that any volume of functional data (activation map, noise ceilings, retinotopy results, R2 values, t-contrasts) can be projected onto the subject's flat map.
 
-For each subject, select a run of bold data that is either in native (T1w) space or in MNI (normalized) space, depending on the data you wish to project onto flat maps.
+For each subject, select a run of bold data that is either in native (T1w) space or in MNI (normalized) space, depending on the data you are working with.
 
 In ipython:
 ```python
@@ -125,20 +126,21 @@ for s in slist:
 ```
 
 ------------
-**Step 3. Generate transforms from functional space (T1w or MNI) to Freesurfer surface space**
+**Step 4. Generate transforms from functional space (T1w or MNI) to Freesurfer surface space**
 
-First, save each subject's mean epi image (ref.nii.gz, from step 2) into the pycortex database. E.g.,
+First, save each subject's mean epi image (ref.nii.gz, from step 2) into the pycortex database. \
+E.g.,
 ```bash
 cd /abs/path/to/venv/pycortex_venv/share/pycortex/db/sub-01/transforms
 mkdir align_auto_ref
 cp /abs/path/to/ref_imgages/sub-01/ref.nii.gz align_auto_ref
 ```
 
-In your bash shell, set the SUBJECTS_DIR variable (Freesurfer's default subject data directory) to the repository that contains the CNeuromod freesurfer data (e.g., anat.freesurfer)
+In your bash shell, set the SUBJECTS_DIR variable to your freesurfer data directory
 ```bash
 SUBJECTS_DIR="/abs/path/to/neuromod/anat.freesurfer"
 ```
-Note that the cortex.align.automatic function requires matching directory names in Freesurfer's SUBJECTS_DIR and in pycortex/db for the same subject in order to work.
+Note that the cortex.align.automatic function requires matching directory names for the same subject in Freesurfer's SUBJECTS_DIR and in pycortex/db in order to work.
 
 In ipython:
 ```python
@@ -158,11 +160,15 @@ for s in slist:
 ```
 
 ------------
-**Step 4. Import Freesurfer flat maps into Pycortex**
+**Step 5. Import Freesurfer flat maps into Pycortex**
 
 Flat maps, or patches, live in anat.freesurfer/sub-0*/surf under the name "full", to indicate cortical patches that include most of the cortex (excluding some of the medial surface).
 
-Warning: The following command line should only be ran once to import a new flat map. If maps are annotated (e.g., using Inkscape to draw ROIs), running this command line again will overwrite the overlay.svg file on which the annotations displayed in Pycortex are saved.
+In your bash shell, set the SUBJECTS_DIR variable to your freesurfer data directory
+```bash
+SUBJECTS_DIR="/abs/path/to/neuromod/anat.freesurfer"
+```
+Warning: the following command line should only be ran once to import a new flat map. If maps are annotated (e.g., using Inkscape to draw ROIs), running this command line again will overwrite the overlay.svg file on which the annotations displayed in Pycortex are saved, and annotations will be lost.
 
 In ipython:
 ```python
@@ -176,11 +182,11 @@ for s in slist:
 ```
 
 ------------
-**Step 5. Visualize functional data in Pycortex**
+**Step 6. Visualize functional data in Pycortex**
 
-Here is an example of how to visualize a functional volume on a flat map in Pycortex. For simplicity, I'm loading the mean epi volume (ref.nii.gz) that was used to compute the transformation from volume to surface. It's not a particularly informative map, but it's a quick way to test whether volumes are loading properly into Pycortex and learn to use the interface.
+Here is an example of how to visualize a functional volume on a flat map in Pycortex. For simplicity, I'm loading the mean epi volume (ref.nii.gz) that was used to compute the transformation from volume to surface. It's not a particularly informative map, but it's a quick way to test whether volumes are loading properly into Pycortex and gain familiarity with the interface.
 
-In your shell, set the Freesurfer SUBJECTS_DIR variable to find your data
+In your shell, set the Freesurfer SUBJECTS_DIR variable to your freesurfer data directory
 ```bash
 SUBJECTS_DIR="/abs/path/to/neuromod/anat.freesurfer"
 ```
@@ -192,7 +198,7 @@ import nibabel as nib
 import numpy as np
 
 '''
-Load your volume
+Load your results map (volume)
 '''
 # specify subject number
 s = '01'
@@ -206,7 +212,7 @@ vol_arr = np.swapaxes(nib.load(vol).get_fdata(), 0, -1)
 '''
 Threshold your color map
 Voxels whose values are set to NaN are not displayed
-Min and max only set the range of the color bar
+Min and max values only set the range of the color bar
 '''
 vol_thresh = 3.7
 vol_arr[vol_arr < vol_thresh] = np.nan
@@ -218,10 +224,10 @@ Select a color map
 https://gallantlab.org/pycortex/colormaps.html
 In the Pycortex interface, clic on the color bar to see available options
 '''
-cmap = 'terrain'
+cmap = 'terrain' #'magma'
 
 '''
-Convert the volume to surface space usin the transformation from step 3)
+Convert the volume to surface space usin the transformation from step 4
 '''
 surf_vol = cortex.Volume(vol_arr, f'sub-{s}', 'align_auto', vmin=min_val, vmax=max_val, cmap=cmap)
 
@@ -231,15 +237,15 @@ Visualize volume in pycortex web browser interface
 cortex.webshow(surf_vol, recache=True)
 ```
 
-To view the surface as a flat map in the interface, clic Open Control: surface (top right), and drag the "unfold" slider from 0 to 1. The visualization of ROIs drawn in Inkscape can be managed under "rois". Different options are available for brightness, opacity, etc.
+The web interface will open a window in your default web browser. To view the surface as a flat map with the interface, click 'Open Control:surface' (top right), and drag the 'unfold' slider from 0 to 1. The visualization of ROIs drawn in Inkscape can be managed under 'rois'. Different options are available for brightness, opacity, etc.
 
 
 ------------
-**Step 6. Drawing ROI boundaries in Inkscape**
+**Step 7. Drawing ROI boundaries in Inkscape**
 
 Install Inkscape to draw ROI boundaries on flat surface. Depending on your installation, you may need to specify the Inkscape path in the pycortex config file ~/.config/pycortex/options.cfg under “dependency paths”
 
-In your shell, set the Freesurfer SUBJECTS_DIR variable to find your data
+In your shell, set the Freesurfer SUBJECTS_DIR variable to your freesurfer data directory
 ```bash
 SUBJECTS_DIR="/abs/path/to/neuromod/anat.freesurfer"
 ```
@@ -277,7 +283,7 @@ This command opens the Inkscape interface
 cortex.add_roi(vareas_vol, **dict(colorbar_location='left', pixelwise=True, nanmean=True, with_curvature=True))
 
 '''
-NOTE: this step (cortex.add_roi) can be repeated many times per subject to load additional surfaces in Inkscape in order to draw / validate ROIs boundries using multiple statistical maps.
+NOTE: this step (cortex.add_roi) can be repeated many times per subject to load additional surfaces in Inkscape in order to draw / validate ROIs boundries with multiple statistical maps.
 E.g.,
 '''
 FFA_path = f'{floc_roi_path}/fLoc_T1w_FFA.nii.gz'
@@ -289,25 +295,24 @@ cortex.add_roi(FFA_vol, **dict(colorbar_location='left', pixelwise=True, nanmean
 ```
 
 Drawing ROI boundaries in Inkscape:
-- label each image used as reference to trace ROI boundaries (e.g. "FFA"). On the right, under 'Layers and Objects: data', rename the 'img_new_roi' layer appropriately (‘rename layer’)
-- create one ROI layer per drawn ROI (even if these ROIs are derived from the same data map). Under 'rois:shapes', right click, select 'add layer' (directly under 'shapes'). Rename the ‘new_roi’ layer with relevant ROI name (V1, V2, etc): right click, 'rename layer'. Note that this name is the ROI label that will show in Pycortex (although label display can be turned off).
+- label each image used as reference to trace ROI boundaries (e.g. "FFA"). On the right menu, select the 'Layers and Objects' tab. Under 'data', rename the 'img_new_roi' layer appropriately (right click, select ‘rename layer’)
+- create one ROI layer per drawn ROI (even if these ROIs are derived from the same data map). Under 'rois:shapes', right click, select 'Add Layer' (directly under 'shapes'). Rename the ‘new_roi’ layer with relevant ROI name (V1, V2, etc): right click, 'Rename Layer'. Note that this name is the ROI label that will show in Pycortex (although label display can be turned off).
 - On the ROI layer, draw each ROI (typically one drawn 'object' per hemishpere, on the same layer, so that each side receives its own label).
-- To draw: select the pencil tool (icon is on the left-hand side menu);
+- To draw: select the pencil tool (icon is on the left-hand side menu; 'Draw freehand lines (P)');
 https://inkscape-manuals.readthedocs.io/en/latest/pencil-tool.html
-- At the bottom left, select the stroke colour: white or black stroke, no fill. (e.g., Fill: None, Stroke: white). Clic on the colour to set the fill color, hold shift and click on colour to set the stroke color.
-- At the top, select ‘Create Bspline path’, set smoothing (e.g., 17.0)
-- In the top right-hand menu, select 'Fill and stroke style tab: Stroke style tab'. Set stroke width (e.g., 4.0 pixels (px))
-- You can zoom in to draw
-- Click on the relevant ROI layer, then hold the left mouse button and trace the ROI contour on the image. This action will create a sub-layer path object under the ROI layer. Use a single continuous stroke per ROI hemisphere: each stroke creates a different path object who receives the ROI label when displayed (one ROI label per hemisphere is typical). Multiple strokes (paths) per ROI within the same hemishpere will generate multiple ROI labels when displayed in Pycortex (although those can be turned off).
-
-- When you're done tracing from a given data map, click 'File:Save' (top right), and then close Inkscape. Do not use 'Save As'. Changes (ROI annotations) will be saved directly on the subject's overlay.svg file. The next time you load a volume as a surface in Pycortex (e.g., as shown in Step 5), the ROI boundaries you drew and their labels will be visible. The visualization of ROIs drawn in Inkscape can be managed under "rois" in the Pycortex interface.
+- At the bottom left, select the stroke colour: white or black stroke, no fill. (e.g., Fill: None, Stroke: white). Click on the colour to set the fill color, hold shift and click on colour to set the stroke color.
+- In the top right menu, under Mode, select ‘Create Bspline path’. Set smoothing (e.g., 17.0)
+- In the top right-hand menu, select the 'Fill and stroke style' tab, then the 'Stroke style' sub-tab. Set stroke width (e.g., 4.0 pixels (px))
+- You can zoom in to draw more easily
+- Click on the relevant ROI layer, then hold the left mouse button and trace the ROI contour on the image. This action will create a sub-layer path object directly under the ROI layer. Use a single continuous stroke per ROI per hemisphere: each stroke creates a different path object who receives the ROI label when displayed (one ROI label per hemisphere is typical). Multiple strokes (paths) per ROI within the same hemishpere will generate multiple ROI labels when displayed in Pycortex (although those can be turned off).
+- When you're done tracing from a given data map, click 'File:Save' (top left menu), and then close Inkscape. Do not use 'Save As'. Changes (ROI annotations) will be saved directly on the subject's overlay.svg file. The next time you load a volume as a surface in Pycortex (e.g., as shown in Step 6 above), the ROI boundaries you drew and their labels will be visible. The visualization of ROIs drawn in Inkscape can be managed under "rois" in the Pycortex interface.
 
 ------------
-**Step 7. Save images**
+**Step 8. Save images**
 
 Once you are happy with the images you see in Pycortex, you can export them using matplotlib
 
-In your shell, set the Freesurfer SUBJECTS_DIR variable to find your data
+In your shell, set the Freesurfer SUBJECTS_DIR variable to your freesurfer data directory
 ```bash
 SUBJECTS_DIR="/abs/path/to/neuromod/anat.freesurfer"
 ```
@@ -320,7 +325,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 '''
-Follow the same steps as in Step 5 to transform your volume into surface.
+Follow the same steps as in Step 6 to transform your volume into surface.
 This time, drawn ROIs should be visible.
 '''
 surf_vol = cortex.Volume(vol_arr, f'sub-{s}', 'align_auto', vmin=min_val, vmax=max_val, cmap=cmap)
@@ -331,6 +336,7 @@ Examples of use: https://python.hotexamples.com/examples/cortex/-/quickshow/pyth
 '''
 fig = plt.figure(figsize=(17,10))
 
+# without color bar
 cortex.quickshow(surf_vol, pixelwise=True, with_colorbar=False, nanmean=True, with_curvature=True, sampler='trilinear', with_labels=False, with_rois=True, curv_brightness=1.0, dpi=300, fig=fig)
 fig.savefig(f'/abs/path/to/project/figures/sub-{s}_results.png', dpi=300)
 
