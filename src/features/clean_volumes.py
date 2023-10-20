@@ -168,7 +168,8 @@ if __name__ == '__main__':
     Clean up Neuropythy output volumes resampled to T1w functional space
     '''
     npy_dir_path = f'/home/mstlaure/projects/rrg-pbellec/mstlaure/retino_analysis/results/npythy/{sub}'
-    file_list = glob.glob(f'{npy_dir_path}/resampled*.nii.gz')
+    found_list = glob.glob(f'{npy_dir_path}/resampled*.nii.gz')
+    file_list = [x for x in found_list if 'goodvox' not in x]
 
     for file in file_list:
         rs_vol = unmask(apply_mask(nib.load(file), clean_mask), clean_mask)
