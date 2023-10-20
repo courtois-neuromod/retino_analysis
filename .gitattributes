@@ -5,6 +5,7 @@
 *.tsv annex.largefiles=nothing
 *.py annex.largefiles=nothing
 stimuli/*mat annex.largefiles=(largerthan=100kb)
+masks/*nii.gz=nothing
 
 * annex.backend=MD5E
 **/.git* annex.largefiles=nothing
