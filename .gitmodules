@@ -1,10 +1,10 @@
-[submodule "retino_stimuli"]
-	path = retino_stimuli
-	url = /project/rrg-pbellec/ria-beluga/alias/cneuromod_raw/retinotopy/stimuli
-	datalad-id = 52140b46-63c8-45a7-a03f-2f2cab0db23f
-	datalad-url = "ria+file:///project/rrg-pbellec/ria-beluga#~cneuromod_raw/retinotopy/stimuli"
 [submodule "data/retinotopy/stimuli"]
 	path = data/retinotopy/stimuli
 	url = /project/rrg-pbellec/ria-beluga/alias/cneuromod_raw/retinotopy/stimuli
 	datalad-id = 52140b46-63c8-45a7-a03f-2f2cab0db23f
 	datalad-url = "ria+file:///project/rrg-pbellec/ria-beluga#~cneuromod_raw/retinotopy/stimuli"
+[submodule "data/freesurfer"]
+	path = data/freesurfer
+	url = /lustre03/project/6003287/datasets/cneuromod_processed/smriprep/sourcedata/freesurfer
+	datalad-id = e91589e2-3533-4b78-9bd2-660e2cc26a59
+	datalad-url = /lustre03/project/6003287/datasets/cneuromod_processed/smriprep/sourcedata/freesurfer
