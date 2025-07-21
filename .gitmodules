@@ -3,9 +3,6 @@
 	url = /project/rrg-pbellec/ria-beluga/alias/cneuromod_raw/retinotopy/stimuli
 	datalad-id = 52140b46-63c8-45a7-a03f-2f2cab0db23f
 	datalad-url = "ria+file:///project/rrg-pbellec/ria-beluga#~cneuromod_raw/retinotopy/stimuli"
-[submodule "popeye"]
-	path = popeye
-	url = git@github.com:kdesimone/popeye.git
 [submodule "data/freesurfer"]
 	path = data/freesurfer
 	url = /lustre03/project/6003287/datasets/cneuromod_processed/smriprep/sourcedata/freesurfer
