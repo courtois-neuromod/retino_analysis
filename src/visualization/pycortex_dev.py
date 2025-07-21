@@ -118,7 +118,7 @@ pycortex_db_dir = '/home/labopb/Documents/Marie/neuromod/pycortex_venv2/share/py
 pa = f'{pycortex_db_dir}/S{s}_final/transforms/align_auto_ref/ref.nii.gz'
 pa_arr = np.swapaxes(nib.load(pa).get_fdata(), 0, -1)
 cmap = 'Retinotopy_RYBCR' # try others?
-pa_vol_raw = cortex.Volume(pa_arr, f'S{s}_final', 'align_auto', vmin=np.nanmin (pa_arr), vmax=np.nanmax(pa_arr), cmap=cmap)
+pa_vol_raw = cortex.Volume(pa_arr, f'S{s}_final', 'align_auto', vmin=np.nanmin(pa_arr), vmax=np.nanmax(pa_arr), cmap=cmap)
 
 # DO this only once (for new flat map)
 # importing a new flat map will overwrite the overlay.svg and erase
